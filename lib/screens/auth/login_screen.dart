@@ -41,6 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
+                spacing: 12,
                 children: [
                   const Text(
                     'LOGIN',
@@ -50,13 +51,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       letterSpacing: 1,
                     ),
                   ),
-                  const SizedBox(height: 12),
                   const Text(
                     'Welcome! Login di sini untuk membuktikan kamu admin.',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 13, color: AppColors.gray600),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 20),
 
                   if (auth.error != null) ...[
                     Container(
@@ -71,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 4),
                   ],
 
                   TextField(
@@ -79,14 +79,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(hintText: 'Email'),
                   ),
-                  const SizedBox(height: 12),
                   TextField(
                     controller: _passCtrl,
                     obscureText: true,
                     decoration: const InputDecoration(hintText: 'Password'),
                     onSubmitted: (_) => _submit(),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
 
                   SizedBox(
                     width: double.infinity,

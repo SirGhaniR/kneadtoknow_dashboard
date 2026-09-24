@@ -51,11 +51,10 @@ class ApiService {
     try {
       await _dio.post(ApiConfig.logout);
     } on DioException {
-      // ignore if there are error
+      // silent
     }
   }
 
-  /// Extract error message from DioException.
   static String parseError(Object e) {
     if (e is DioException) {
       final data = e.response?.data;
