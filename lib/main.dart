@@ -4,6 +4,11 @@ import 'package:provider/provider.dart';
 import 'config/app_theme.dart';
 import 'providers/auth_provider.dart';
 import 'screens/auth/login_screen.dart';
+import 'screens/contact/contact_list_screen.dart';
+import 'screens/contact_info/contact_info_screen.dart';
+import 'screens/dashboard/dashboard_screen.dart';
+import 'screens/gallery/gallery_list_screen.dart';
+import 'screens/news/news_list_screen.dart';
 import 'services/api_service.dart';
 
 void main() async {
@@ -14,12 +19,12 @@ void main() async {
   await auth.loadSession();
 
   runApp(
-    ChangeNotifierProvider.value(value: auth, child: const TastyFoodApp()),
+    ChangeNotifierProvider.value(value: auth, child: const KneadToKnowApp()),
   );
 }
 
-class TastyFoodApp extends StatelessWidget {
-  const TastyFoodApp({super.key});
+class KneadToKnowApp extends StatelessWidget {
+  const KneadToKnowApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +33,12 @@ class TastyFoodApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       home: const _RootRouter(),
+      routes: {
+        '/news': (_) => const NewsListScreen(),
+        '/gallery': (_) => const GalleryListScreen(),
+        '/contacts': (_) => const ContactListScreen(),
+        '/contact-info': (_) => const ContactInfoScreen(),
+      },
     );
   }
 }
@@ -38,24 +49,6 @@ class _RootRouter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isLoggedIn = context.select<AuthProvider, bool>((a) => a.isLoggedIn);
-
-    if (!isLoggedIn) return const LoginScreen();
-
-    return Scaffold(
-      appBar: AppBar(title: const Text('Dashboard')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Login successful'),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => context.read<AuthProvider>().logout(),
-              child: const Text('LOGOUT'),
-            ),
-          ],
-        ),
-      ),
-    );
+    return isLoggedIn ? const DashboardScreen() : const LoginScreen();
   }
 }
