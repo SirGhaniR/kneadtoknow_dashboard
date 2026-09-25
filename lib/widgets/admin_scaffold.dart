@@ -25,7 +25,7 @@ class AdminScaffold extends StatelessWidget {
       ),
       body: SafeArea(
         top: true,
-        bottom: false,
+        bottom: true,
         child: Column(
           children: [
             _Header(title: title, actions: actions),

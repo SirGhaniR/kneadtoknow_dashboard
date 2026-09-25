@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../providers/dashboard_provider.dart';
 import '../../widgets/admin_scaffold.dart';
+import '../../widgets/chart_activity_line.dart';
+import '../../widgets/chart_comparison_donut.dart';
 import '../../widgets/stat_card.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -53,29 +55,58 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return RefreshIndicator(
       onRefresh: () => provider.load(),
-      child: ListView(
+      child: ListView.separated(
         padding: const EdgeInsets.all(16),
-        children: [
-          const Text(
-            'Statistik',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 1.4,
-            children: [
-              StatCard(label: 'Total Berita', value: stats.totalNews),
-              StatCard(label: 'Total Galeri', value: stats.totalGallery),
-              StatCard(label: 'Total Kontak', value: stats.totalContacts),
-              StatCard(label: 'Belum Dibaca', value: stats.unreadContacts),
-            ],
-          ),
-        ],
+        itemCount: 4,
+        separatorBuilder: (_, _) => const SizedBox(height: 20),
+        itemBuilder: (context, index) {
+          switch (index) {
+            case 0:
+              return const Text(
+                'Statistik',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              );
+            case 1:
+              return GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: 1.6,
+                children: [
+                  StatCard(
+                    route: '/news',
+                    label: 'Total Berita',
+                    value: stats.totalNews,
+                  ),
+                  StatCard(
+                    route: '/gallery',
+                    label: 'Total Galeri',
+                    value: stats.totalGallery,
+                  ),
+                  StatCard(
+                    route: '/contacts',
+                    label: 'Total Kontak',
+                    value: stats.totalContacts,
+                  ),
+                  StatCard(
+                    route: '/contacts',
+                    label: 'Belum Dibaca',
+                    value: stats.unreadContacts,
+                  ),
+                ],
+              );
+            case 2:
+              return ChartActivityLine(data: stats.activity);
+            default:
+              return ChartComparisonDonut(
+                newsCount: stats.totalNews,
+                galleryCount: stats.totalGallery,
+                contactCount: stats.totalContacts,
+              );
+          }
+        },
       ),
     );
   }
