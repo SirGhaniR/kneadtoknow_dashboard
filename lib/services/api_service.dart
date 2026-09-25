@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/api_config.dart';
+import '../models/dashboard_stats.dart';
 import '../models/user.dart';
 
 class ApiService {
@@ -15,6 +16,15 @@ class ApiService {
   );
 
   ApiService._();
+
+  static Future<DashboardStats> getDashboardStats() async {
+    try {
+      final res = await _dio.get(ApiConfig.dashboardStats);
+      return DashboardStats.fromJson(res.data['data']);
+    } on DioException catch (e) {
+      throw Exception(parseError(e));
+    }
+  }
 
   static void init() {
     _dio.interceptors.add(

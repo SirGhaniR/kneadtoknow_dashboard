@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'config/app_theme.dart';
 import 'providers/auth_provider.dart';
+import 'providers/dashboard_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/contact/contact_list_screen.dart';
 import 'screens/contact_info/contact_info_screen.dart';
@@ -19,7 +20,13 @@ void main() async {
   await auth.loadSession();
 
   runApp(
-    ChangeNotifierProvider.value(value: auth, child: const KneadToKnowApp()),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: auth),
+        ChangeNotifierProvider(create: (_) => DashboardProvider()),
+      ],
+      child: const KneadToKnowApp(),
+    ),
   );
 }
 
