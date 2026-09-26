@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/api_config.dart';
 import '../models/dashboard_stats.dart';
+import '../models/news.dart';
 import '../models/user.dart';
 
 class ApiService {
@@ -21,6 +22,19 @@ class ApiService {
     try {
       final res = await _dio.get(ApiConfig.dashboardStats);
       return DashboardStats.fromJson(res.data['data']);
+    } on DioException catch (e) {
+      throw Exception(parseError(e));
+    }
+  }
+
+  static Future<List<News>> getNews({int page = 1}) async {
+    try {
+      final res = await _dio.get(
+        ApiConfig.news,
+        queryParameters: {'page': page, 'per_page': 10},
+      );
+      final list = res.data['data'] as List;
+      return list.map((e) => News.fromJson(e)).toList();
     } on DioException catch (e) {
       throw Exception(parseError(e));
     }
