@@ -37,17 +37,22 @@ class KneadToKnowApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'TastyFood Dashboard',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      home: const _RootRouter(),
-      routes: {
-        '/news': (_) => const NewsListScreen(),
-        '/gallery': (_) => const GalleryListScreen(),
-        '/contacts': (_) => const ContactListScreen(),
-        '/contact-info': (_) => const ContactInfoScreen(),
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
       },
+      child: MaterialApp(
+        title: 'TastyFood Dashboard',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light,
+        home: const _RootRouter(),
+        routes: {
+          '/news': (_) => const NewsListScreen(),
+          '/gallery': (_) => const GalleryListScreen(),
+          '/contacts': (_) => const ContactListScreen(),
+          '/contact-info': (_) => const ContactInfoScreen(),
+        },
+      ),
     );
   }
 }

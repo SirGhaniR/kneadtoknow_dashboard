@@ -60,14 +60,19 @@ class ApiService {
     }
   }
 
-  static Future<List<News>> getNews({int page = 1}) async {
+  static Future<NewsPage> getNewsPage({int page = 1}) async {
     try {
       final res = await _dio.get(
         ApiConfig.news,
         queryParameters: {'page': page, 'per_page': 10},
       );
       final list = res.data['data'] as List;
-      return list.map((e) => News.fromJson(e)).toList();
+      final meta = res.data['meta'] as Map? ?? {};
+      return NewsPage(
+        items: list.map((e) => News.fromJson(e)).toList(),
+        currentPage: meta['current_page'] ?? 1,
+        lastPage: meta['last_page'] ?? 1,
+      );
     } on DioException catch (e) {
       throw Exception(parseError(e));
     }
@@ -161,4 +166,16 @@ class ApiService {
       throw Exception(parseError(e));
     }
   }
+}
+
+class NewsPage {
+  final List<News> items;
+  final int currentPage;
+  final int lastPage;
+
+  NewsPage({
+    required this.items,
+    required this.currentPage,
+    required this.lastPage,
+  });
 }

@@ -7,11 +7,10 @@ import '../services/api_service.dart';
 
 class NewsProvider extends ChangeNotifier {
   final List<News> items = [];
-  int _page = 1;
+  int currentPage = 1;
+  int lastPage = 1;
   bool isLoading = false;
-  bool isLoadingMore = false;
   bool isSaving = false;
-  bool hasMore = true;
   String? error;
 
   Future<bool> create({
@@ -29,7 +28,7 @@ class NewsProvider extends ChangeNotifier {
         isFeatured: isFeatured,
         image: image,
       );
-      await load();
+      await load(page: 1);
       return true;
     } catch (e) {
       error = e.toString().replaceFirst('Exception: ', '');
@@ -43,8 +42,10 @@ class NewsProvider extends ChangeNotifier {
   Future<bool> delete(int id) async {
     try {
       await ApiService.deleteNews(id);
-      items.removeWhere((n) => n.id == id);
-      notifyListeners();
+      final target = items.length == 1 && currentPage > 1
+          ? currentPage - 1
+          : currentPage;
+      await load(page: target);
       return true;
     } catch (e) {
       error = e.toString().replaceFirst('Exception: ', '');
@@ -53,46 +54,22 @@ class NewsProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> load() async {
+  Future<void> load({int page = 1}) async {
     isLoading = true;
     error = null;
-    _page = 1;
-    hasMore = true;
     notifyListeners();
 
     try {
-      final result = await ApiService.getNews(page: 1);
+      final result = await ApiService.getNewsPage(page: page);
       items
         ..clear()
-        ..addAll(result);
-      hasMore = result.length >= 10;
+        ..addAll(result.items);
+      currentPage = result.currentPage;
+      lastPage = result.lastPage;
     } catch (e) {
       error = e.toString().replaceFirst('Exception: ', '');
     } finally {
       isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  Future<void> loadMore() async {
-    if (isLoadingMore || !hasMore) return;
-    isLoadingMore = true;
-    notifyListeners();
-
-    try {
-      final next = _page + 1;
-      final result = await ApiService.getNews(page: next);
-      if (result.isEmpty) {
-        hasMore = false;
-      } else {
-        items.addAll(result);
-        _page = next;
-        hasMore = result.length >= 10;
-      }
-    } catch (_) {
-      hasMore = false;
-    } finally {
-      isLoadingMore = false;
       notifyListeners();
     }
   }
@@ -114,7 +91,7 @@ class NewsProvider extends ChangeNotifier {
         isFeatured: isFeatured,
         image: image,
       );
-      await load();
+      await load(page: currentPage);
       return true;
     } catch (e) {
       error = e.toString().replaceFirst('Exception: ', '');

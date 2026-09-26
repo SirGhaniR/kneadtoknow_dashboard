@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   static const gray50 = Color(0xFFF9FAFB);
@@ -18,11 +17,11 @@ class AppColors {
 
 class AppTheme {
   static ThemeData get light {
-    final base = ThemeData.light(useMaterial3: true);
-    return base.copyWith(
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      fontFamily: 'Montserrat',
       scaffoldBackgroundColor: AppColors.gray50,
-      textTheme: GoogleFonts.montserratTextTheme(base.textTheme)
-          .apply(bodyColor: AppColors.gray900, displayColor: AppColors.gray900),
       colorScheme: const ColorScheme.light(
         primary: AppColors.gray900,
         secondary: AppColors.yellow600,
@@ -37,39 +36,40 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
+        isDense: true,
+        fillColor: AppColors.gray100,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: const BorderSide(color: AppColors.gray500),
+          borderSide: const BorderSide(color: AppColors.gray200),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: const BorderSide(color: AppColors.gray500),
+          borderSide: const BorderSide(color: AppColors.gray200),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: const BorderSide(color: AppColors.gray900, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.gray500),
         ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 16,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        hintStyle: TextStyle(fontSize: 14, color: AppColors.gray500),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
+          elevation: 0,
           backgroundColor: AppColors.gray900,
           foregroundColor: Colors.white,
           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          textStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.gray900,
-          side: const BorderSide(color: AppColors.gray300),
+          side: const BorderSide(color: AppColors.gray200),
           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          textStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
         ),
       ),
       cardTheme: const CardThemeData(
