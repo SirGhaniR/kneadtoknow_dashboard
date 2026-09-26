@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../models/news.dart';
@@ -8,8 +10,48 @@ class NewsProvider extends ChangeNotifier {
   int _page = 1;
   bool isLoading = false;
   bool isLoadingMore = false;
+  bool isSaving = false;
   bool hasMore = true;
   String? error;
+
+  Future<bool> create({
+    required String title,
+    required String content,
+    required bool isFeatured,
+    required File image,
+  }) async {
+    isSaving = true;
+    notifyListeners();
+    try {
+      await ApiService.createNews(
+        title: title,
+        content: content,
+        isFeatured: isFeatured,
+        image: image,
+      );
+      await load();
+      return true;
+    } catch (e) {
+      error = e.toString().replaceFirst('Exception: ', '');
+      return false;
+    } finally {
+      isSaving = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> delete(int id) async {
+    try {
+      await ApiService.deleteNews(id);
+      items.removeWhere((n) => n.id == id);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      error = e.toString().replaceFirst('Exception: ', '');
+      notifyListeners();
+      return false;
+    }
+  }
 
   Future<void> load() async {
     isLoading = true;
@@ -51,6 +93,34 @@ class NewsProvider extends ChangeNotifier {
       hasMore = false;
     } finally {
       isLoadingMore = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> update({
+    required int id,
+    required String title,
+    required String content,
+    required bool isFeatured,
+    File? image,
+  }) async {
+    isSaving = true;
+    notifyListeners();
+    try {
+      await ApiService.updateNews(
+        id: id,
+        title: title,
+        content: content,
+        isFeatured: isFeatured,
+        image: image,
+      );
+      await load();
+      return true;
+    } catch (e) {
+      error = e.toString().replaceFirst('Exception: ', '');
+      return false;
+    } finally {
+      isSaving = false;
       notifyListeners();
     }
   }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,12 +13,43 @@ class ApiService {
     BaseOptions(
       baseUrl: ApiConfig.baseUrl,
       connectTimeout: const Duration(seconds: 15),
-      receiveTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 30),
       headers: {'Accept': 'application/json'},
     ),
   );
 
   ApiService._();
+
+  static Future<News> createNews({
+    required String title,
+    required String content,
+    required bool isFeatured,
+    required File image,
+  }) async {
+    try {
+      final form = FormData.fromMap({
+        'title': title,
+        'content': content,
+        'is_featured': isFeatured ? 1 : 0,
+        'image': await MultipartFile.fromFile(
+          image.path,
+          filename: image.path.split('/').last,
+        ),
+      });
+      final res = await _dio.post(ApiConfig.news, data: form);
+      return News.fromJson(res.data['data']);
+    } on DioException catch (e) {
+      throw Exception(parseError(e));
+    }
+  }
+
+  static Future<void> deleteNews(int id) async {
+    try {
+      await _dio.delete('${ApiConfig.news}/$id');
+    } on DioException catch (e) {
+      throw Exception(parseError(e));
+    }
+  }
 
   static Future<DashboardStats> getDashboardStats() async {
     try {
@@ -82,8 +115,17 @@ class ApiService {
   static String parseError(Object e) {
     if (e is DioException) {
       final data = e.response?.data;
-      if (data is Map && data['message'] != null) {
-        return data['message'].toString();
+      if (data is Map) {
+        if (data['errors'] is Map) {
+          final errors = data['errors'] as Map;
+          if (errors.isNotEmpty) {
+            final first = errors.values.first;
+            if (first is List && first.isNotEmpty) {
+              return first.first.toString();
+            }
+          }
+        }
+        if (data['message'] != null) return data['message'].toString();
       }
       if (e.type == DioExceptionType.connectionTimeout) {
         return 'Connection timeout. Check if the server is running.';
@@ -91,5 +133,32 @@ class ApiService {
       return e.message ?? 'Something went wrong';
     }
     return e.toString();
+  }
+
+  static Future<News> updateNews({
+    required int id,
+    required String title,
+    required String content,
+    required bool isFeatured,
+    File? image,
+  }) async {
+    try {
+      final fields = <String, dynamic>{
+        'title': title,
+        'content': content,
+        'is_featured': isFeatured ? 1 : 0,
+      };
+      if (image != null) {
+        fields['image'] = await MultipartFile.fromFile(
+          image.path,
+          filename: image.path.split('/').last,
+        );
+      }
+      final form = FormData.fromMap(fields);
+      final res = await _dio.put('${ApiConfig.news}/$id', data: form);
+      return News.fromJson(res.data['data']);
+    } on DioException catch (e) {
+      throw Exception(parseError(e));
+    }
   }
 }

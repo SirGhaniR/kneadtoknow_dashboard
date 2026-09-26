@@ -7,12 +7,14 @@ class AdminScaffold extends StatelessWidget {
   final String title;
   final Widget child;
   final List<Widget>? actions;
+  final Widget? floatingActionButton;
 
   const AdminScaffold({
     super.key,
     required this.title,
     required this.child,
     this.actions,
+    this.floatingActionButton,
   });
 
   @override
@@ -23,8 +25,8 @@ class AdminScaffold extends StatelessWidget {
         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         child: const AppSidebar(),
       ),
+      floatingActionButton: floatingActionButton,
       body: SafeArea(
-        top: true,
         bottom: true,
         child: Column(
           children: [

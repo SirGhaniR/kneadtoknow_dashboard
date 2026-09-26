@@ -7,6 +7,7 @@ import '../../providers/news_provider.dart';
 import '../../utils/image_url.dart';
 import '../../utils/time_ago.dart';
 import '../../widgets/admin_scaffold.dart';
+import 'news_form_screen.dart';
 
 class NewsListScreen extends StatefulWidget {
   const NewsListScreen({super.key});
@@ -22,7 +23,17 @@ class _NewsListScreenState extends State<NewsListScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<NewsProvider>();
 
-    return AdminScaffold(title: 'Berita', child: _buildBody(provider));
+    return AdminScaffold(
+      title: 'Berita',
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _openForm(),
+        backgroundColor: AppColors.gray900,
+        foregroundColor: Colors.white,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        child: const Icon(Icons.add),
+      ),
+      child: _buildBody(provider),
+    );
   }
 
   @override
@@ -79,7 +90,11 @@ class _NewsListScreenState extends State<NewsListScreen> {
               child: Center(child: CircularProgressIndicator()),
             );
           }
-          return _NewsTile(news: provider.items[index]);
+          final news = provider.items[index];
+          return _NewsTile(
+            news: news,
+            onTap: () => _openForm(news: news),
+          );
         },
       ),
     );
@@ -91,96 +106,110 @@ class _NewsListScreenState extends State<NewsListScreen> {
       context.read<NewsProvider>().loadMore();
     }
   }
+
+  Future<void> _openForm({News? news}) async {
+    await Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => NewsFormScreen(news: news)));
+  }
 }
 
 class _NewsTile extends StatelessWidget {
   final News news;
+  final VoidCallback onTap;
 
-  const _NewsTile({required this.news});
+  const _NewsTile({required this.news, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppColors.gray300),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (news.image != null && news.image!.isNotEmpty)
-            Image.network(
-              imageUrl(news.image),
-              width: 100,
-              height: 100,
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Container(
-                width: 100,
-                height: 100,
-                color: AppColors.gray100,
-                child: const Icon(Icons.broken_image, color: AppColors.gray500),
-              ),
-            ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 6,
-                children: [
-                  Row(
-                    spacing: 8,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          news.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      if (news.isFeatured)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          color: AppColors.yellow100,
-                          child: const Text(
-                            'Featured',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: AppColors.yellow800,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  Text(
-                    news.content,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.gray600,
-                    ),
-                  ),
-                  Text(
-                    timeAgo(news.createdAt),
-                    style: const TextStyle(
-                      fontSize: 11,
+    return Material(
+      color: Colors.white,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.gray300),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (news.image != null && news.image!.isNotEmpty)
+                Image.network(
+                  imageUrl(news.image),
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => Container(
+                    width: 100,
+                    height: 100,
+                    color: AppColors.gray100,
+                    child: const Icon(
+                      Icons.broken_image,
                       color: AppColors.gray500,
                     ),
                   ),
-                ],
+                ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 6,
+                    children: [
+                      Row(
+                        spacing: 8,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              news.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          if (news.isFeatured)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              color: AppColors.yellow100,
+                              child: const Text(
+                                'Featured',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: AppColors.yellow800,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      Text(
+                        news.content,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.gray600,
+                        ),
+                      ),
+                      Text(
+                        timeAgo(news.createdAt),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.gray500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
