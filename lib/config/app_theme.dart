@@ -61,7 +61,9 @@ class AppTheme {
           backgroundColor: AppColors.gray900,
           foregroundColor: Colors.white,
           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          minimumSize: const Size(0, 0),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           textStyle: const TextStyle(
             fontFamily: 'Montserrat',
             fontWeight: FontWeight.w600,
@@ -74,7 +76,9 @@ class AppTheme {
           foregroundColor: AppColors.gray900,
           side: const BorderSide(color: AppColors.gray900, width: 0.5),
           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          minimumSize: const Size(0, 0),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           textStyle: const TextStyle(
             fontFamily: 'Montserrat',
             fontWeight: FontWeight.w600,

@@ -89,6 +89,7 @@ class _GalleryFormState extends State<GalleryForm> {
 
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: 10,
             children: [
               SizedBox(
                 width: double.infinity,
@@ -96,8 +97,8 @@ class _GalleryFormState extends State<GalleryForm> {
                   onPressed: isSaving ? null : _submit,
                   child: isSaving
                       ? const SizedBox(
-                          height: 18,
-                          width: 18,
+                          height: 16,
+                          width: 16,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             color: Colors.white,
@@ -106,14 +107,17 @@ class _GalleryFormState extends State<GalleryForm> {
                       : Text(isEdit ? 'Update Foto' : 'Upload Foto'),
                 ),
               ),
-              if (widget.onCancel != null)
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: isSaving ? null : widget.onCancel,
-                    child: const Text('Cancel'),
-                  ),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: isSaving
+                      ? null
+                      : isEdit
+                      ? widget.onCancel
+                      : _clear,
+                  child: const Text('Cancel'),
                 ),
+              ),
             ],
           ),
         ],
@@ -135,6 +139,15 @@ class _GalleryFormState extends State<GalleryForm> {
     _descriptionCtrl = TextEditingController(
       text: widget.gallery?.description ?? '',
     );
+  }
+
+  void _clear() {
+    _titleCtrl.clear();
+    _descriptionCtrl.clear();
+    setState(() {
+      _pickedImage = null;
+      _error = null;
+    });
   }
 
   Widget _field({required String label, required Widget child}) {

@@ -25,7 +25,7 @@ class GalleryDetailDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: const BoxDecoration(
                 border: Border(bottom: BorderSide(color: AppColors.gray200)),
               ),
@@ -33,7 +33,7 @@ class GalleryDetailDialog extends StatelessWidget {
                 children: [
                   const Text(
                     'Detail Foto',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                   ),
                   const Spacer(),
                   IconButton(
@@ -45,7 +45,7 @@ class GalleryDetailDialog extends StatelessWidget {
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 16,
@@ -87,12 +87,29 @@ class GalleryDetailDialog extends StatelessWidget {
                           ),
                         ),
                       ),
-                    _section(
-                      'Created',
-                      Text(
-                        _formatDate(gallery.createdAt),
-                        style: const TextStyle(fontSize: 13),
-                      ),
+                    Row(
+                      spacing: 16,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: _section(
+                            'Created',
+                            Text(
+                              _formatDate(gallery.createdAt),
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: _section(
+                            'Updated',
+                            Text(
+                              _formatDate(gallery.updatedAt),
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -149,7 +166,7 @@ class GalleryDetailDialog extends StatelessWidget {
   Widget _section(String label, Widget child) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 6,
+      spacing: 4,
       children: [
         Text(
           label,

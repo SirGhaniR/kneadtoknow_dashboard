@@ -5,6 +5,7 @@ class News {
   final String? image;
   final bool isFeatured;
   final DateTime createdAt;
+  final DateTime updatedAt;
 
   News({
     required this.id,
@@ -13,6 +14,7 @@ class News {
     required this.image,
     required this.isFeatured,
     required this.createdAt,
+    required this.updatedAt,
   });
 
   factory News.fromJson(Map<String, dynamic> json) => News(
@@ -22,5 +24,6 @@ class News {
     image: json['image'],
     isFeatured: json['is_featured'] == true,
     createdAt: DateTime.parse(json['created_at']),
+    updatedAt: DateTime.parse(json['updated_at']),
   );
 }

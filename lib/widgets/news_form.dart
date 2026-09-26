@@ -199,6 +199,7 @@ class _NewsFormState extends State<NewsForm> {
 
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: 10,
             children: [
               SizedBox(
                 width: double.infinity,
@@ -206,8 +207,8 @@ class _NewsFormState extends State<NewsForm> {
                   onPressed: isSaving ? null : _submit,
                   child: isSaving
                       ? const SizedBox(
-                          height: 18,
-                          width: 18,
+                          height: 16,
+                          width: 16,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             color: Colors.white,
@@ -216,14 +217,17 @@ class _NewsFormState extends State<NewsForm> {
                       : Text(isEdit ? 'Update News' : 'Create News'),
                 ),
               ),
-              if (widget.onCancel != null)
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: isSaving ? null : widget.onCancel,
-                    child: const Text('Cancel'),
-                  ),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: isSaving
+                      ? null
+                      : isEdit
+                      ? widget.onCancel
+                      : _clear,
+                  child: const Text('Cancel'),
                 ),
+              ),
             ],
           ),
         ],
@@ -244,6 +248,16 @@ class _NewsFormState extends State<NewsForm> {
     _titleCtrl = TextEditingController(text: widget.news?.title ?? '');
     _contentCtrl = TextEditingController(text: widget.news?.content ?? '');
     _isFeatured = widget.news?.isFeatured ?? false;
+  }
+
+  void _clear() {
+    _titleCtrl.clear();
+    _contentCtrl.clear();
+    setState(() {
+      _pickedImage = null;
+      _isFeatured = false;
+      _error = null;
+    });
   }
 
   Widget _field({required String label, required Widget child}) {

@@ -21,7 +21,7 @@ class NewsDetailDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: const BoxDecoration(
                 border: Border(bottom: BorderSide(color: AppColors.gray200)),
               ),
@@ -29,7 +29,7 @@ class NewsDetailDialog extends StatelessWidget {
                 children: [
                   const Text(
                     'Detail Berita',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                   ),
                   const Spacer(),
                   IconButton(
@@ -41,7 +41,7 @@ class NewsDetailDialog extends StatelessWidget {
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 16,
@@ -103,12 +103,29 @@ class NewsDetailDialog extends StatelessWidget {
                         ),
                       ),
                     ),
-                    _section(
-                      'Created',
-                      Text(
-                        _formatDate(news.createdAt),
-                        style: const TextStyle(fontSize: 13),
-                      ),
+                    Row(
+                      spacing: 16,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: _section(
+                            'Created',
+                            Text(
+                              _formatDate(news.createdAt),
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: _section(
+                            'Updated',
+                            Text(
+                              _formatDate(news.updatedAt),
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -127,11 +144,11 @@ class NewsDetailDialog extends StatelessWidget {
                       Navigator.pop(context);
                       onEdit();
                     },
-                    child: const Text('EDIT'),
+                    child: const Text('Edit'),
                   ),
                   OutlinedButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('CLOSE'),
+                    child: const Text('Close'),
                   ),
                 ],
               ),
