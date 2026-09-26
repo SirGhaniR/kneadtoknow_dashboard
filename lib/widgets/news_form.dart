@@ -76,6 +76,10 @@ class _ImagePickerBox extends StatelessWidget {
             'Pilih gambar',
             style: TextStyle(fontSize: 14, color: AppColors.gray500),
           ),
+          Text(
+            'Accepted formats: PNG, JPG, GIF, SVG (Max: 1MB)',
+            style: TextStyle(fontSize: 12, color: AppColors.gray400),
+          ),
         ],
       ),
     );
@@ -245,11 +249,11 @@ class _NewsFormState extends State<NewsForm> {
   Widget _field({required String label, required Widget child}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 6,
+      spacing: 8,
       children: [
         Text(
           label,
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
         ),
         child,
       ],

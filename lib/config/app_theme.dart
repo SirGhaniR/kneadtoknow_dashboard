@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const gray50 = Color(0xFFF9FAFB);
-  static const gray100 = Color(0xFFF3F4F6);
-  static const gray200 = Color(0xFFE5E7EB);
-  static const gray300 = Color(0xFFD1D5DB);
-  static const gray500 = Color(0xFF6B7280);
-  static const gray600 = Color(0xFF4B5563);
+  static const gray50 = Color(0xFFf9fafb);
+  static const gray100 = Color(0xFFf3f4f6);
+  static const gray200 = Color(0xFFe5e7eb);
+  static const gray300 = Color(0xFFd1d5db);
+  static const gray400 = Color(0xFF9ca3af);
+  static const gray500 = Color(0xFF6b7280);
+  static const gray600 = Color(0xFF4b5563);
   static const gray700 = Color(0xFF374151);
-  static const gray800 = Color(0xFF1F2937);
+  static const gray800 = Color(0xFF1f2937);
   static const gray900 = Color(0xFF111827);
-  static const yellow100 = Color(0xFFFEF9C3);
-  static const yellow600 = Color(0xFFCA8A04);
-  static const yellow800 = Color(0xFF854D0E);
+  static const gray950 = Color(0xFF030712);
+  static const yellow100 = Color(0xFFfef9c3);
+  static const yellow600 = Color(0xFFca8a04);
+  static const yellow800 = Color(0xFF854d0e);
 }
 
 class AppTheme {
@@ -59,17 +61,25 @@ class AppTheme {
           backgroundColor: AppColors.gray900,
           foregroundColor: Colors.white,
           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          textStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          textStyle: const TextStyle(
+            fontFamily: 'Montserrat',
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.gray900,
-          side: const BorderSide(color: AppColors.gray200),
+          side: const BorderSide(color: AppColors.gray900, width: 0.5),
           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          textStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          textStyle: const TextStyle(
+            fontFamily: 'Montserrat',
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
         ),
       ),
       cardTheme: const CardThemeData(
@@ -78,8 +88,8 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       ),
       dividerTheme: const DividerThemeData(
-        color: AppColors.gray200,
-        thickness: 1,
+        color: AppColors.gray700,
+        thickness: 0.5,
       ),
     );
   }

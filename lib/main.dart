@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'config/app_theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/dashboard_provider.dart';
+import 'providers/gallery_provider.dart';
 import 'providers/news_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/contact/contact_list_screen.dart';
@@ -26,6 +27,7 @@ void main() async {
         ChangeNotifierProvider.value(value: auth),
         ChangeNotifierProvider(create: (_) => DashboardProvider()),
         ChangeNotifierProvider(create: (_) => NewsProvider()),
+        ChangeNotifierProvider(create: (_) => GalleryProvider()),
       ],
       child: const KneadToKnowApp(),
     ),
