@@ -51,32 +51,37 @@ class _ContactReplyScreenState extends State<ContactReplyScreen> {
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 4,
+                      spacing: 6,
                       children: [
                         _infoLine(
-                          'Dari:',
-                          '${widget.contact.name} (${widget.contact.email})',
+                          label: 'Dari',
+                          value:
+                              '${widget.contact.name} (${widget.contact.email})',
                         ),
                         _infoLine(
-                          'Subjek:',
-                          widget.contact.subject.isEmpty
+                          label: 'Subjek',
+                          value: widget.contact.subject.isEmpty
                               ? 'Pesan dari website'
                               : widget.contact.subject,
                         ),
-                        const SizedBox(height: 6),
-                        const Text(
-                          'Pesan:',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          widget.contact.message,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: AppColors.gray700,
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Pesan:',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              widget.contact.message,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: AppColors.gray700,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -177,18 +182,18 @@ class _ContactReplyScreenState extends State<ContactReplyScreen> {
     );
   }
 
-  Widget _infoLine(String label, String value) {
-    return RichText(
-      text: TextSpan(
-        style: const TextStyle(fontSize: 13, color: AppColors.gray900),
-        children: [
-          TextSpan(
-            text: '$label ',
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-          TextSpan(text: value),
-        ],
-      ),
+  Widget _infoLine({required String label, required String value}) {
+    return Row(
+      children: [
+        Text(
+          '$label: ',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+        Text(
+          value,
+          style: const TextStyle(fontSize: 14, color: AppColors.gray700),
+        ),
+      ],
     );
   }
 
