@@ -5,6 +5,7 @@ import '../../providers/dashboard_provider.dart';
 import '../../widgets/admin_scaffold.dart';
 import '../../widgets/chart_activity_line.dart';
 import '../../widgets/chart_comparison_donut.dart';
+import '../../widgets/dashboard_sections.dart';
 import '../../widgets/stat_card.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -31,24 +32,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildBody(DashboardProvider provider) {
-    if (provider.isLoading && provider.stats == null) {
+    if (provider.stats == null) {
+      if (provider.error != null) {
+        return Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 12,
+            children: [
+              Text(provider.error!),
+              ElevatedButton(
+                onPressed: () => provider.load(),
+                child: const Text('COBA LAGI'),
+              ),
+            ],
+          ),
+        );
+      }
       return const Center(child: CircularProgressIndicator());
-    }
-
-    if (provider.error != null && provider.stats == null) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          spacing: 12,
-          children: [
-            Text(provider.error!),
-            ElevatedButton(
-              onPressed: () => provider.load(),
-              child: const Text('COBA LAGI'),
-            ),
-          ],
-        ),
-      );
     }
 
     final stats = provider.stats!;
@@ -57,7 +57,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       onRefresh: () => provider.load(),
       child: ListView.separated(
         padding: const EdgeInsets.all(16),
-        itemCount: 4,
+        itemCount: 8,
         separatorBuilder: (_, _) => const SizedBox(height: 20),
         itemBuilder: (context, index) {
           switch (index) {
@@ -73,7 +73,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
-                childAspectRatio: 1.6,
+                childAspectRatio: 1.4,
                 children: [
                   StatCard(
                     route: '/news',
@@ -99,12 +99,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
               );
             case 2:
               return ChartActivityLine(data: stats.activity);
-            default:
+            case 3:
               return ChartComparisonDonut(
                 newsCount: stats.totalNews,
                 galleryCount: stats.totalGallery,
                 contactCount: stats.totalContacts,
               );
+            case 4:
+              return QuickActions(unreadContacts: stats.unreadContacts);
+            case 5:
+              return RecentNewsSection(items: stats.recentNews);
+            case 6:
+              return RecentContactsSection(items: stats.recentContacts);
+            default:
+              return FeaturedNewsSection(items: stats.featuredNews);
           }
         },
       ),

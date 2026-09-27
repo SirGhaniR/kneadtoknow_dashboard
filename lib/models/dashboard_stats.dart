@@ -1,3 +1,6 @@
+import 'contact.dart';
+import 'news.dart';
+
 class ActivityGroups {
   final List<ActivityItem> news;
   final List<ActivityItem> gallery;
@@ -37,6 +40,9 @@ class DashboardStats {
   final int totalContacts;
   final int unreadContacts;
   final ActivityGroups activity;
+  final List<News> recentNews;
+  final List<Contact> recentContacts;
+  final List<News> featuredNews;
 
   DashboardStats({
     required this.totalNews,
@@ -44,6 +50,9 @@ class DashboardStats {
     required this.totalContacts,
     required this.unreadContacts,
     required this.activity,
+    required this.recentNews,
+    required this.recentContacts,
+    required this.featuredNews,
   });
 
   factory DashboardStats.fromJson(Map<String, dynamic> json) => DashboardStats(
@@ -52,5 +61,14 @@ class DashboardStats {
     totalContacts: json['total_contacts'] ?? 0,
     unreadContacts: json['unread_contacts'] ?? 0,
     activity: ActivityGroups.fromJson(json['activity'] ?? {}),
+    recentNews: (json['recent_news'] as List? ?? [])
+        .map((e) => News.fromJson(e))
+        .toList(),
+    recentContacts: (json['recent_contacts'] as List? ?? [])
+        .map((e) => Contact.fromJson(e))
+        .toList(),
+    featuredNews: (json['featured_news'] as List? ?? [])
+        .map((e) => News.fromJson(e))
+        .toList(),
   );
 }
