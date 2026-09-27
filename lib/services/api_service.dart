@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/api_config.dart';
+import '../models/contact.dart';
 import '../models/dashboard_stats.dart';
 import '../models/gallery.dart';
 import '../models/news.dart';
@@ -65,6 +66,14 @@ class ApiService {
     }
   }
 
+  static Future<void> deleteContact(int id) async {
+    try {
+      await _dio.delete('${ApiConfig.contacts}/$id');
+    } on DioException catch (e) {
+      throw Exception(parseError(e));
+    }
+  }
+
   static Future<void> deleteGallery(int id) async {
     try {
       await _dio.delete('${ApiConfig.gallery}/$id');
@@ -76,6 +85,24 @@ class ApiService {
   static Future<void> deleteNews(int id) async {
     try {
       await _dio.delete('${ApiConfig.news}/$id');
+    } on DioException catch (e) {
+      throw Exception(parseError(e));
+    }
+  }
+
+  static Future<ContactPage> getContactPage({int page = 1}) async {
+    try {
+      final res = await _dio.get(
+        ApiConfig.contacts,
+        queryParameters: {'page': page, 'per_page': 20},
+      );
+      final list = res.data['data'] as List;
+      final meta = res.data['meta'] as Map? ?? {};
+      return ContactPage(
+        items: list.map((e) => Contact.fromJson(e)).toList(),
+        currentPage: meta['current_page'] ?? 1,
+        lastPage: meta['last_page'] ?? 1,
+      );
     } on DioException catch (e) {
       throw Exception(parseError(e));
     }
@@ -165,6 +192,18 @@ class ApiService {
     }
   }
 
+  static Future<Contact> markContactRead(int id) async {
+    try {
+      final res = await _dio.put(
+        '${ApiConfig.contacts}/$id',
+        data: {'is_read': true},
+      );
+      return Contact.fromJson(res.data['data']);
+    } on DioException catch (e) {
+      throw Exception(parseError(e));
+    }
+  }
+
   static String parseError(Object e) {
     if (e is DioException) {
       final data = e.response?.data;
@@ -239,6 +278,18 @@ class ApiService {
       throw Exception(parseError(e));
     }
   }
+}
+
+class ContactPage {
+  final List<Contact> items;
+  final int currentPage;
+  final int lastPage;
+
+  ContactPage({
+    required this.items,
+    required this.currentPage,
+    required this.lastPage,
+  });
 }
 
 class GalleryPage {
