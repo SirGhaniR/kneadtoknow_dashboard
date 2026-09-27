@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/api_config.dart';
 import '../models/contact.dart';
+import '../models/contact_info.dart';
 import '../models/dashboard_stats.dart';
 import '../models/gallery.dart';
 import '../models/news.dart';
@@ -85,6 +86,17 @@ class ApiService {
   static Future<void> deleteNews(int id) async {
     try {
       await _dio.delete('${ApiConfig.news}/$id');
+    } on DioException catch (e) {
+      throw Exception(parseError(e));
+    }
+  }
+
+  static Future<ContactInfo?> getContactInfo() async {
+    try {
+      final res = await _dio.get(ApiConfig.contactInfo);
+      final data = res.data['data'];
+      if (data == null) return null;
+      return ContactInfo.fromJson(data);
     } on DioException catch (e) {
       throw Exception(parseError(e));
     }
@@ -225,6 +237,22 @@ class ApiService {
       return e.message ?? 'Something went wrong';
     }
     return e.toString();
+  }
+
+  static Future<ContactInfo> saveContactInfo({
+    required String email,
+    required String phone,
+    required String address,
+  }) async {
+    try {
+      final res = await _dio.post(
+        ApiConfig.contactInfo,
+        data: {'email': email, 'phone': phone, 'address': address},
+      );
+      return ContactInfo.fromJson(res.data['data']);
+    } on DioException catch (e) {
+      throw Exception(parseError(e));
+    }
   }
 
   static Future<Gallery> updateGallery({
