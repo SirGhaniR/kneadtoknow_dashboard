@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../config/app_theme.dart';
 import '../models/contact.dart';
 import '../providers/contact_provider.dart';
+import '../screens/contact/contact_reply_screen.dart';
 
 class ContactDetailDialog extends StatelessWidget {
   final Contact contact;
@@ -154,8 +155,22 @@ class ContactDetailDialog extends StatelessWidget {
               child: Row(
                 spacing: 12,
                 children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ContactReplyScreen(contact: contact),
+                        ),
+                      );
+                    },
+                    child: const Text('Reply'),
+                  ),
                   if (!contact.isRead)
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF10B981),
+                      ),
                       onPressed: () async {
                         final provider = context.read<ContactProvider>();
                         await provider.markRead(contact.id);

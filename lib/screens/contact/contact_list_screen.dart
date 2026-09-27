@@ -7,6 +7,7 @@ import '../../providers/contact_provider.dart';
 import '../../utils/time_ago.dart';
 import '../../widgets/admin_scaffold.dart';
 import '../../widgets/contact_detail_dialog.dart';
+import 'contact_reply_screen.dart';
 
 class ContactListScreen extends StatefulWidget {
   const ContactListScreen({super.key});
@@ -272,6 +273,21 @@ class _ContactTile extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ContactReplyScreen(contact: contact),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.reply_outlined),
+                    iconSize: 18,
+                    color: const Color(0xFF3B82F6),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    tooltip: 'Reply',
+                  ),
                   if (onMarkRead != null)
                     IconButton(
                       onPressed: onMarkRead,
