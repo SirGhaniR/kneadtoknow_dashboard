@@ -197,12 +197,14 @@ class _ContactTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: contact.isRead ? Colors.white : AppColors.yellow100,
+      color: Colors.white,
       child: InkWell(
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            border: Border.all(color: AppColors.gray300),
+            border: Border.all(
+              color: contact.isRead ? AppColors.gray300 : AppColors.yellow600,
+            ),
           ),
           padding: const EdgeInsets.all(12),
           child: Column(
@@ -326,8 +328,8 @@ class _InfoBanner extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFEF9C3),
-        border: Border.all(color: const Color(0xFFFDE68A)),
+        color: AppColors.yellow50,
+        border: Border.all(color: AppColors.yellow600),
       ),
       child: const Text(
         'Kontak dibuat melalui form dalam website sehingga tidak bisa dibuat secara manual.',
