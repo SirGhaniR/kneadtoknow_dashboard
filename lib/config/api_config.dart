@@ -1,5 +1,8 @@
 class ApiConfig {
-  static const String _origin = 'http://192.168.1.25:8000';
+  static const String _origin = String.fromEnvironment(
+    'API_ORIGIN',
+    defaultValue: 'http://192.168.1.25:8000',
+  );
 
   static const String baseUrl = '$_origin/api';
   static const String imageBaseUrl = '$_origin/uploaded_images';
