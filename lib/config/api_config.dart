@@ -3,6 +3,7 @@ class ApiConfig {
 
   static const String baseUrl = '$_origin/api';
   static const String imageBaseUrl = '$_origin/uploaded_images';
+  static const String websiteUrl = _origin;
 
   static const String login = '/login';
   static const String logout = '/logout';

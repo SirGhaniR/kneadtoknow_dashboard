@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../config/api_config.dart';
 import '../config/app_theme.dart';
 import '../providers/auth_provider.dart';
 
@@ -48,7 +50,7 @@ class AppSidebar extends StatelessWidget {
             _SidebarItem(
               icon: Icons.open_in_new,
               label: 'Kembali ke website',
-              onTap: () {},
+              onTap: _openWebsite,
             ),
             const Spacer(),
             _SidebarItem(
@@ -80,6 +82,13 @@ class AppSidebar extends StatelessWidget {
     _closeDrawer(context);
     onNavigate?.call();
     Navigator.of(context).popUntil((r) => r.isFirst);
+  }
+
+  Future<void> _openWebsite() async {
+    final uri = Uri.parse(ApiConfig.websiteUrl);
+    try {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {}
   }
 
   Future<void> _logout(BuildContext context) async {
