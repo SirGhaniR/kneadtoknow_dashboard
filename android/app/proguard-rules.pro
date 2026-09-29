@@ -1,0 +1,13 @@
+-keep class com.google.gson.** { *; }
+-keep class okhttp3.** { *; }
+-keep class okio.** { *; }
+-keep class org.chromium.** { *; }
+-keepattributes *Annotation*
+-keepattributes Signature
+-keepattributes InnerClasses
+-keep class io.flutter.** { *; }
+-keep class io.flutter.plugins.** { *; }
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn org.chromium.**
+-dontwarn com.google.android.play.core.**
