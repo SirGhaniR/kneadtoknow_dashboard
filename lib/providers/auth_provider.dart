@@ -11,6 +11,15 @@ class AuthProvider extends ChangeNotifier {
   bool isLoading = false;
   String? error;
 
+  Future<void> expireSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(ApiConfig.tokenKey);
+
+    user = null;
+    isLoggedIn = false;
+    notifyListeners();
+  }
+
   Future<void> loadSession() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString(ApiConfig.tokenKey);

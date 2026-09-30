@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 
 import 'config/app_theme.dart';
 import 'providers/auth_provider.dart';
-import 'providers/contact_provider.dart';
 import 'providers/contact_info_provider.dart';
+import 'providers/contact_provider.dart';
 import 'providers/dashboard_provider.dart';
 import 'providers/gallery_provider.dart';
 import 'providers/news_provider.dart';
@@ -22,6 +22,8 @@ void main() async {
 
   final auth = AuthProvider();
   await auth.loadSession();
+
+  ApiService.onUnauthorized = auth.expireSession;
 
   runApp(
     MultiProvider(
