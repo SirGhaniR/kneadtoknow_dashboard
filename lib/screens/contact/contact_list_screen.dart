@@ -304,7 +304,7 @@ class _ContactTile extends StatelessWidget {
                     onPressed: onDelete,
                     icon: const Icon(Icons.delete_outline),
                     iconSize: 18,
-                    color: const Color(0xFFF87171),
+                    color: AppColors.red400,
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                     tooltip: 'Hapus',

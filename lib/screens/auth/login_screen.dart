@@ -66,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Text(
                         auth.error!,
                         style: const TextStyle(
-                          color: Color(0xFF991B1B),
+                          color: AppColors.red800,
                           fontSize: 13,
                         ),
                       ),

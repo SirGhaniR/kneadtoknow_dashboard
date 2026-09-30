@@ -52,10 +52,10 @@ class _ContactInfoFormState extends State<ContactInfoForm> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12),
-              color: const Color(0xFFFEE2E2),
+              color: AppColors.red100,
               child: Text(
                 _error!,
-                style: const TextStyle(color: Color(0xFF991B1B), fontSize: 13),
+                style: const TextStyle(color: AppColors.red800, fontSize: 13),
               ),
             ),
 

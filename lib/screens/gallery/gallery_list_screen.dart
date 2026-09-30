@@ -85,7 +85,7 @@ class _GalleryCard extends StatelessWidget {
                           ),
                           _overlayIcon(
                             icon: Icons.delete_outline,
-                            color: const Color(0xFFF87171),
+                            color: AppColors.red400,
                             onTap: onDelete,
                           ),
                         ],

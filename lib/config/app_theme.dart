@@ -21,6 +21,9 @@ class AppColors {
   static const yellow600 = Color(0xFFca8a04);
   static const yellow700 = Color(0xFFa16207);
   static const yellow800 = Color(0xFF854d0e);
+  static const red100 = Color(0xFFfee2e2);
+  static const red400 = Color(0xFFf87171);
+  static const red800 = Color(0xFF991b1b);
 }
 
 class AppTheme {
@@ -92,6 +95,15 @@ class AppTheme {
           ),
         ),
       ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          textStyle: const TextStyle(
+            fontFamily: 'Montserrat',
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
       cardTheme: const CardThemeData(
         color: Colors.white,
         elevation: 1,
@@ -100,6 +112,10 @@ class AppTheme {
       dividerTheme: const DividerThemeData(
         color: AppColors.gray700,
         thickness: 0.5,
+      ),
+      dialogTheme: const DialogThemeData(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        actionsPadding: EdgeInsets.symmetric(horizontal: 14),
       ),
     );
   }

@@ -84,19 +84,44 @@ class AppSidebar extends StatelessWidget {
     Navigator.of(context).popUntil((r) => r.isFirst);
   }
 
+  Future<void> _logout(BuildContext context) async {
+    _closeDrawer(context);
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        title: const Text('Logout?'),
+        content: const Text('Anda yakin ingin keluar dari akun ini?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('BATAL'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text(
+              'LOGOUT',
+              style: TextStyle(color: AppColors.red400),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true || !context.mounted) return;
+
+    final auth = context.read<AuthProvider>();
+    onNavigate?.call();
+    Navigator.of(context).popUntil((r) => r.isFirst);
+    await auth.logout();
+  }
+
   Future<void> _openWebsite() async {
     final uri = Uri.parse(ApiConfig.websiteUrl);
     try {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (_) {}
-  }
-
-  Future<void> _logout(BuildContext context) async {
-    final auth = context.read<AuthProvider>();
-    _closeDrawer(context);
-    onNavigate?.call();
-    Navigator.of(context).popUntil((r) => r.isFirst);
-    await auth.logout();
   }
 }
 
