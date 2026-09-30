@@ -50,7 +50,7 @@ class KneadToKnowApp extends StatelessWidget {
         FocusManager.instance.primaryFocus?.unfocus();
       },
       child: MaterialApp(
-        title: 'TastyFood Dashboard',
+        title: 'Knead to Know - Admin',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light,
         home: const _RootRouter(),
