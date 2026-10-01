@@ -111,7 +111,7 @@ class ChartActivityLine extends StatelessWidget {
         ],
         lineTouchData: LineTouchData(
           touchTooltipData: LineTouchTooltipData(
-            getTooltipColor: (touchedSpot) => AppColors.gray600,
+            getTooltipColor: (touchedSpot) => AppColors.gray900,
             getTooltipItems: (touchedSpots) {
               return touchedSpots.map((spot) {
                 final idx = spot.x.toInt();
@@ -119,9 +119,9 @@ class ChartActivityLine extends StatelessWidget {
                 final dateStr = DateFormat('d MMM').format(date);
 
                 final label = switch (spot.barIndex) {
-                  0 => 'Berita',
-                  1 => 'Galeri',
-                  _ => 'Kontak',
+                  0 => 'Galeri',
+                  1 => 'Kontak',
+                  _ => 'Berita',
                 };
 
                 return LineTooltipItem(
