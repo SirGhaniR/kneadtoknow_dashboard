@@ -85,7 +85,13 @@ class AppSidebar extends StatelessWidget {
   }
 
   Future<void> _logout(BuildContext context) async {
-    _closeDrawer(context);
+    final auth = context.read<AuthProvider>();
+    final navigator = Navigator.of(context);
+    final scaffold = Scaffold.maybeOf(context);
+
+    if (scaffold != null && scaffold.isDrawerOpen) {
+      scaffold.closeDrawer();
+    }
 
     final confirm = await showDialog<bool>(
       context: context,
@@ -109,11 +115,10 @@ class AppSidebar extends StatelessWidget {
       ),
     );
 
-    if (confirm != true || !context.mounted) return;
+    if (confirm != true) return;
 
-    final auth = context.read<AuthProvider>();
     onNavigate?.call();
-    Navigator.of(context).popUntil((r) => r.isFirst);
+    navigator.popUntil((r) => r.isFirst);
     await auth.logout();
   }
 
