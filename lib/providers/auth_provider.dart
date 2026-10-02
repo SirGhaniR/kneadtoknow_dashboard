@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../config/api_config.dart';
 import '../models/user.dart';
 import '../services/api_service.dart';
+import '../utils/app_exception.dart';
 
 class AuthProvider extends ChangeNotifier {
   User? user;
@@ -14,7 +15,6 @@ class AuthProvider extends ChangeNotifier {
   Future<void> expireSession() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(ApiConfig.tokenKey);
-
     user = null;
     isLoggedIn = false;
     notifyListeners();
@@ -38,14 +38,16 @@ class AuthProvider extends ChangeNotifier {
       await prefs.setString(ApiConfig.tokenKey, result['token']);
       user = result['user'];
       isLoggedIn = true;
-      isLoading = false;
-      notifyListeners();
       return true;
+    } on AppException catch (e) {
+      error = e.message;
+      return false;
     } catch (e) {
-      error = e.toString().replaceFirst('Exception: ', '');
+      error = 'An unexpected error occurred';
+      return false;
+    } finally {
       isLoading = false;
       notifyListeners();
-      return false;
     }
   }
 
@@ -53,10 +55,8 @@ class AuthProvider extends ChangeNotifier {
     try {
       await ApiService.logout();
     } catch (_) {}
-
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(ApiConfig.tokenKey);
-
     user = null;
     isLoggedIn = false;
     notifyListeners();

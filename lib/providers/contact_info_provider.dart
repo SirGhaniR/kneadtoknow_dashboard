@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/contact_info.dart';
 import '../services/api_service.dart';
+import '../utils/app_exception.dart';
 
 class ContactInfoProvider extends ChangeNotifier {
   ContactInfo? info;
@@ -16,8 +17,10 @@ class ContactInfoProvider extends ChangeNotifier {
 
     try {
       info = await ApiService.getContactInfo();
+    } on AppException catch (e) {
+      error = e.message;
     } catch (e) {
-      error = e.toString().replaceFirst('Exception: ', '');
+      error = 'An unexpected error occurred';
     } finally {
       isLoading = false;
       notifyListeners();
@@ -40,8 +43,11 @@ class ContactInfoProvider extends ChangeNotifier {
         address: address,
       );
       return true;
+    } on AppException catch (e) {
+      error = e.message;
+      return false;
     } catch (e) {
-      error = e.toString().replaceFirst('Exception: ', '');
+      error = 'An unexpected error occurred';
       return false;
     } finally {
       isSaving = false;

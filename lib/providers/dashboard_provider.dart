@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/dashboard_stats.dart';
 import '../services/api_service.dart';
+import '../utils/app_exception.dart';
 
 class DashboardProvider extends ChangeNotifier {
   DashboardStats? stats;
@@ -15,8 +16,10 @@ class DashboardProvider extends ChangeNotifier {
 
     try {
       stats = await ApiService.getDashboardStats();
+    } on AppException catch (e) {
+      error = e.message;
     } catch (e) {
-      error = e.toString().replaceFirst('Exception: ', '');
+      error = 'An unexpected error occurred';
     } finally {
       isLoading = false;
       notifyListeners();

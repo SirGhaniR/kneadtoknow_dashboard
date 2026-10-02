@@ -11,6 +11,7 @@ import '../models/dashboard_stats.dart';
 import '../models/gallery.dart';
 import '../models/news.dart';
 import '../models/user.dart';
+import '../utils/error_handler.dart';
 
 class ApiService {
   static VoidCallback? onUnauthorized;
@@ -43,7 +44,7 @@ class ApiService {
       final res = await _dio.post(ApiConfig.gallery, data: form);
       return Gallery.fromJson(res.data['data']);
     } on DioException catch (e) {
-      throw Exception(parseError(e));
+      throw ErrorHandler.handle(e);
     }
   }
 
@@ -66,7 +67,7 @@ class ApiService {
       final res = await _dio.post(ApiConfig.news, data: form);
       return News.fromJson(res.data['data']);
     } on DioException catch (e) {
-      throw Exception(parseError(e));
+      throw ErrorHandler.handle(e);
     }
   }
 
@@ -74,7 +75,7 @@ class ApiService {
     try {
       await _dio.delete('${ApiConfig.contacts}/$id');
     } on DioException catch (e) {
-      throw Exception(parseError(e));
+      throw ErrorHandler.handle(e);
     }
   }
 
@@ -82,7 +83,7 @@ class ApiService {
     try {
       await _dio.delete('${ApiConfig.gallery}/$id');
     } on DioException catch (e) {
-      throw Exception(parseError(e));
+      throw ErrorHandler.handle(e);
     }
   }
 
@@ -90,7 +91,7 @@ class ApiService {
     try {
       await _dio.delete('${ApiConfig.news}/$id');
     } on DioException catch (e) {
-      throw Exception(parseError(e));
+      throw ErrorHandler.handle(e);
     }
   }
 
@@ -101,7 +102,7 @@ class ApiService {
       if (data == null) return null;
       return ContactInfo.fromJson(data);
     } on DioException catch (e) {
-      throw Exception(parseError(e));
+      throw ErrorHandler.handle(e);
     }
   }
 
@@ -119,7 +120,7 @@ class ApiService {
         lastPage: meta['last_page'] ?? 1,
       );
     } on DioException catch (e) {
-      throw Exception(parseError(e));
+      throw ErrorHandler.handle(e);
     }
   }
 
@@ -128,7 +129,7 @@ class ApiService {
       final res = await _dio.get(ApiConfig.dashboardStats);
       return DashboardStats.fromJson(res.data['data']);
     } on DioException catch (e) {
-      throw Exception(parseError(e));
+      throw ErrorHandler.handle(e);
     }
   }
 
@@ -146,7 +147,7 @@ class ApiService {
         lastPage: meta['last_page'] ?? 1,
       );
     } on DioException catch (e) {
-      throw Exception(parseError(e));
+      throw ErrorHandler.handle(e);
     }
   }
 
@@ -164,7 +165,7 @@ class ApiService {
         lastPage: meta['last_page'] ?? 1,
       );
     } on DioException catch (e) {
-      throw Exception(parseError(e));
+      throw ErrorHandler.handle(e);
     }
   }
 
@@ -201,7 +202,7 @@ class ApiService {
       final data = res.data['data'];
       return {'token': data['token'], 'user': User.fromJson(data['user'])};
     } on DioException catch (e) {
-      throw Exception(parseError(e));
+      throw ErrorHandler.handle(e);
     }
   }
 

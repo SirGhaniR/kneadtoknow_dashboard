@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/contact.dart';
 import '../services/api_service.dart';
+import '../utils/app_exception.dart';
 
 class ContactProvider extends ChangeNotifier {
   final List<Contact> items = [];
@@ -18,8 +19,12 @@ class ContactProvider extends ChangeNotifier {
           : currentPage;
       await load(page: target);
       return true;
+    } on AppException catch (e) {
+      error = e.message;
+      notifyListeners();
+      return false;
     } catch (e) {
-      error = e.toString().replaceFirst('Exception: ', '');
+      error = 'An unexpected error occurred';
       notifyListeners();
       return false;
     }
@@ -37,8 +42,10 @@ class ContactProvider extends ChangeNotifier {
         ..addAll(result.items);
       currentPage = result.currentPage;
       lastPage = result.lastPage;
+    } on AppException catch (e) {
+      error = e.message;
     } catch (e) {
-      error = e.toString().replaceFirst('Exception: ', '');
+      error = 'An unexpected error occurred';
     } finally {
       isLoading = false;
       notifyListeners();
@@ -52,8 +59,12 @@ class ContactProvider extends ChangeNotifier {
       if (idx != -1) items[idx] = updated;
       notifyListeners();
       return true;
+    } on AppException catch (e) {
+      error = e.message;
+      notifyListeners();
+      return false;
     } catch (e) {
-      error = e.toString().replaceFirst('Exception: ', '');
+      error = 'An unexpected error occurred';
       notifyListeners();
       return false;
     }

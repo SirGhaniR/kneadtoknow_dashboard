@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../models/gallery.dart';
 import '../services/api_service.dart';
+import '../utils/app_exception.dart';
 
 class GalleryProvider extends ChangeNotifier {
   final List<Gallery> items = [];
@@ -19,7 +20,9 @@ class GalleryProvider extends ChangeNotifier {
     required File image,
   }) async {
     isSaving = true;
+    error = null;
     notifyListeners();
+
     try {
       await ApiService.createGallery(
         title: title,
@@ -28,8 +31,11 @@ class GalleryProvider extends ChangeNotifier {
       );
       await load(page: 1);
       return true;
+    } on AppException catch (e) {
+      error = e.message;
+      return false;
     } catch (e) {
-      error = e.toString().replaceFirst('Exception: ', '');
+      error = 'An unexpected error occurred';
       return false;
     } finally {
       isSaving = false;
@@ -45,8 +51,12 @@ class GalleryProvider extends ChangeNotifier {
           : currentPage;
       await load(page: target);
       return true;
+    } on AppException catch (e) {
+      error = e.message;
+      notifyListeners();
+      return false;
     } catch (e) {
-      error = e.toString().replaceFirst('Exception: ', '');
+      error = 'An unexpected error occurred';
       notifyListeners();
       return false;
     }
@@ -64,8 +74,10 @@ class GalleryProvider extends ChangeNotifier {
         ..addAll(result.items);
       currentPage = result.currentPage;
       lastPage = result.lastPage;
+    } on AppException catch (e) {
+      error = e.message;
     } catch (e) {
-      error = e.toString().replaceFirst('Exception: ', '');
+      error = 'An unexpected error occurred';
     } finally {
       isLoading = false;
       notifyListeners();
@@ -79,7 +91,9 @@ class GalleryProvider extends ChangeNotifier {
     File? image,
   }) async {
     isSaving = true;
+    error = null;
     notifyListeners();
+
     try {
       await ApiService.updateGallery(
         id: id,
@@ -89,8 +103,11 @@ class GalleryProvider extends ChangeNotifier {
       );
       await load(page: currentPage);
       return true;
+    } on AppException catch (e) {
+      error = e.message;
+      return false;
     } catch (e) {
-      error = e.toString().replaceFirst('Exception: ', '');
+      error = 'An unexpected error occurred';
       return false;
     } finally {
       isSaving = false;
