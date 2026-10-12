@@ -13,8 +13,15 @@ class GalleryForm extends StatefulWidget {
   final Gallery? gallery;
   final VoidCallback? onSaved;
   final VoidCallback? onCancel;
+  final ValueChanged<bool>? onDirtyChanged;
 
-  const GalleryForm({super.key, this.gallery, this.onSaved, this.onCancel});
+  const GalleryForm({
+    super.key,
+    this.gallery,
+    this.onSaved,
+    this.onCancel,
+    this.onDirtyChanged,
+  });
 
   @override
   State<GalleryForm> createState() => _GalleryFormState();
@@ -25,6 +32,7 @@ class _GalleryFormState extends State<GalleryForm> {
   late final TextEditingController _descriptionCtrl;
   File? _pickedImage;
   String? _error;
+  bool _isDirty = false;
 
   bool get isEdit => widget.gallery != null;
 
@@ -51,7 +59,7 @@ class _GalleryFormState extends State<GalleryForm> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12),
-              color: const Color(0xFFFEE2E2),
+              color: AppColors.red100,
               child: Text(
                 _error!,
                 style: const TextStyle(color: AppColors.red800, fontSize: 13),
@@ -97,8 +105,8 @@ class _GalleryFormState extends State<GalleryForm> {
                   onPressed: isSaving ? null : _submit,
                   child: isSaving
                       ? const SizedBox(
-                          height: 16,
-                          width: 16,
+                          height: 18,
+                          width: 18,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             color: Colors.white,
@@ -112,9 +120,7 @@ class _GalleryFormState extends State<GalleryForm> {
                 child: OutlinedButton(
                   onPressed: isSaving
                       ? null
-                      : isEdit
-                      ? widget.onCancel
-                      : _clear,
+                      : (isEdit ? widget.onCancel : _clear),
                   child: const Text('Cancel'),
                 ),
               ),
@@ -139,6 +145,8 @@ class _GalleryFormState extends State<GalleryForm> {
     _descriptionCtrl = TextEditingController(
       text: widget.gallery?.description ?? '',
     );
+    _titleCtrl.addListener(_markDirty);
+    _descriptionCtrl.addListener(_markDirty);
   }
 
   void _clear() {
@@ -147,21 +155,29 @@ class _GalleryFormState extends State<GalleryForm> {
     setState(() {
       _pickedImage = null;
       _error = null;
+      _isDirty = false;
     });
+    widget.onDirtyChanged?.call(false);
   }
 
   Widget _field({required String label, required Widget child}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 8,
+      spacing: 6,
       children: [
         Text(
           label,
-          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
         ),
         child,
       ],
     );
+  }
+
+  void _markDirty() {
+    if (_isDirty) return;
+    _isDirty = true;
+    widget.onDirtyChanged?.call(true);
   }
 
   Future<void> _pickImage() async {
@@ -173,6 +189,7 @@ class _GalleryFormState extends State<GalleryForm> {
     );
     if (file != null) {
       setState(() => _pickedImage = File(file.path));
+      _markDirty();
     }
   }
 
@@ -213,6 +230,7 @@ class _GalleryFormState extends State<GalleryForm> {
       messenger.showSnackBar(
         SnackBar(content: Text(isEdit ? 'Galeri diupdate' : 'Galeri diupload')),
       );
+      widget.onDirtyChanged?.call(false);
       widget.onSaved?.call();
     } else {
       setState(() => _error = provider.error ?? 'Gagal menyimpan');
@@ -275,10 +293,6 @@ class _ImagePickerBox extends StatelessWidget {
           Text(
             'Pilih gambar',
             style: TextStyle(fontSize: 14, color: AppColors.gray500),
-          ),
-          Text(
-            'Accepted formats: PNG, JPG, GIF, SVG (Max: 1MB)',
-            style: TextStyle(fontSize: 12, color: AppColors.gray400),
           ),
         ],
       ),

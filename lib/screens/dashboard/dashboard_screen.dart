@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/dashboard_provider.dart';
@@ -16,11 +17,17 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  DateTime? _lastBackPress;
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<DashboardProvider>();
 
-    return AdminScaffold(title: 'Dashboard', child: _buildBody(provider));
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: _handleBack,
+      child: AdminScaffold(title: 'Dashboard', child: _buildBody(provider)),
+    );
   }
 
   @override
@@ -117,5 +124,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
         },
       ),
     );
+  }
+
+  void _handleBack(bool didPop, dynamic result) {
+    if (didPop) return;
+
+    final scaffold = Scaffold.maybeOf(context);
+    if (scaffold != null && scaffold.isDrawerOpen) {
+      scaffold.closeDrawer();
+      return;
+    }
+
+    final now = DateTime.now();
+    final isSecondPress =
+        _lastBackPress != null &&
+        now.difference(_lastBackPress!) < const Duration(seconds: 2);
+
+    if (isSecondPress) {
+      SystemNavigator.pop();
+      return;
+    }
+
+    _lastBackPress = now;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(
+          content: Text('Tekan sekali lagi untuk keluar'),
+          duration: Duration(seconds: 2),
+        ),
+      );
   }
 }

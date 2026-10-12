@@ -13,8 +13,15 @@ class NewsForm extends StatefulWidget {
   final News? news;
   final VoidCallback? onSaved;
   final VoidCallback? onCancel;
+  final ValueChanged<bool>? onDirtyChanged;
 
-  const NewsForm({super.key, this.news, this.onSaved, this.onCancel});
+  const NewsForm({
+    super.key,
+    this.news,
+    this.onSaved,
+    this.onCancel,
+    this.onDirtyChanged,
+  });
 
   @override
   State<NewsForm> createState() => _NewsFormState();
@@ -76,10 +83,6 @@ class _ImagePickerBox extends StatelessWidget {
             'Pilih gambar',
             style: TextStyle(fontSize: 14, color: AppColors.gray500),
           ),
-          Text(
-            'Accepted formats: PNG, JPG, GIF, SVG (Max: 1MB)',
-            style: TextStyle(fontSize: 12, color: AppColors.gray400),
-          ),
         ],
       ),
     );
@@ -92,6 +95,7 @@ class _NewsFormState extends State<NewsForm> {
   late bool _isFeatured;
   File? _pickedImage;
   String? _error;
+  bool _isDirty = false;
 
   bool get isEdit => widget.news != null;
 
@@ -118,7 +122,7 @@ class _NewsFormState extends State<NewsForm> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12),
-              color: const Color(0xFFFEE2E2),
+              color: AppColors.red100,
               child: Text(
                 _error!,
                 style: const TextStyle(color: AppColors.red800, fontSize: 13),
@@ -131,7 +135,7 @@ class _NewsFormState extends State<NewsForm> {
               final titleField = _field(
                 label: 'Title',
                 child: TextField(
-                  style: TextStyle(fontSize: 14),
+                  style: const TextStyle(fontSize: 14),
                   controller: _titleCtrl,
                   decoration: const InputDecoration(
                     hintText: 'Enter news title',
@@ -151,7 +155,10 @@ class _NewsFormState extends State<NewsForm> {
                     DropdownMenuItem(value: false, child: Text('No')),
                     DropdownMenuItem(value: true, child: Text('Yes')),
                   ],
-                  onChanged: (v) => setState(() => _isFeatured = v ?? false),
+                  onChanged: (v) {
+                    setState(() => _isFeatured = v ?? false);
+                    _markDirty();
+                  },
                 ),
               );
 
@@ -175,7 +182,7 @@ class _NewsFormState extends State<NewsForm> {
                   _field(
                     label: 'Content',
                     child: TextField(
-                      style: TextStyle(fontSize: 14),
+                      style: const TextStyle(fontSize: 14),
                       controller: _contentCtrl,
                       minLines: 4,
                       maxLines: 8,
@@ -207,8 +214,8 @@ class _NewsFormState extends State<NewsForm> {
                   onPressed: isSaving ? null : _submit,
                   child: isSaving
                       ? const SizedBox(
-                          height: 16,
-                          width: 16,
+                          height: 18,
+                          width: 18,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             color: Colors.white,
@@ -222,9 +229,7 @@ class _NewsFormState extends State<NewsForm> {
                 child: OutlinedButton(
                   onPressed: isSaving
                       ? null
-                      : isEdit
-                      ? widget.onCancel
-                      : _clear,
+                      : (isEdit ? widget.onCancel : _clear),
                   child: const Text('Cancel'),
                 ),
               ),
@@ -248,6 +253,8 @@ class _NewsFormState extends State<NewsForm> {
     _titleCtrl = TextEditingController(text: widget.news?.title ?? '');
     _contentCtrl = TextEditingController(text: widget.news?.content ?? '');
     _isFeatured = widget.news?.isFeatured ?? false;
+    _titleCtrl.addListener(_markDirty);
+    _contentCtrl.addListener(_markDirty);
   }
 
   void _clear() {
@@ -257,21 +264,29 @@ class _NewsFormState extends State<NewsForm> {
       _pickedImage = null;
       _isFeatured = false;
       _error = null;
+      _isDirty = false;
     });
+    widget.onDirtyChanged?.call(false);
   }
 
   Widget _field({required String label, required Widget child}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 8,
+      spacing: 6,
       children: [
         Text(
           label,
-          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
         ),
         child,
       ],
     );
+  }
+
+  void _markDirty() {
+    if (_isDirty) return;
+    _isDirty = true;
+    widget.onDirtyChanged?.call(true);
   }
 
   Future<void> _pickImage() async {
@@ -283,6 +298,7 @@ class _NewsFormState extends State<NewsForm> {
     );
     if (file != null) {
       setState(() => _pickedImage = File(file.path));
+      _markDirty();
     }
   }
 
@@ -325,6 +341,7 @@ class _NewsFormState extends State<NewsForm> {
       messenger.showSnackBar(
         SnackBar(content: Text(isEdit ? 'Berita diupdate' : 'Berita dibuat')),
       );
+      widget.onDirtyChanged?.call(false);
       widget.onSaved?.call();
     } else {
       setState(() => _error = provider.error ?? 'Gagal menyimpan');
