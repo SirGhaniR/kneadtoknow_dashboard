@@ -1,5 +1,6 @@
-String timeAgo(DateTime date) {
-  final diff = DateTime.now().difference(date);
+String timeAgo(DateTime date, {DateTime? now}) {
+  final reference = now ?? DateTime.now();
+  final diff = reference.difference(date);
 
   if (diff.inSeconds < 60) return 'baru saja';
   if (diff.inMinutes < 60) return '${diff.inMinutes} menit yang lalu';
