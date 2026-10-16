@@ -16,14 +16,7 @@ import '../utils/error_handler.dart';
 class ApiService {
   static VoidCallback? onUnauthorized;
 
-  static final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: ApiConfig.baseUrl,
-      connectTimeout: const Duration(seconds: 15),
-      receiveTimeout: const Duration(seconds: 30),
-      headers: {'Accept': 'application/json'},
-    ),
-  );
+  static Dio _dio = _defaultDio();
 
   ApiService._();
 
@@ -170,24 +163,13 @@ class ApiService {
   }
 
   static void init() {
-    _dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) async {
-          final prefs = await SharedPreferences.getInstance();
-          final token = prefs.getString(ApiConfig.tokenKey);
-          if (token != null && token.isNotEmpty) {
-            options.headers['Authorization'] = 'Bearer $token';
-          }
-          handler.next(options);
-        },
-        onError: (error, handler) {
-          if (error.response?.statusCode == 401) {
-            onUnauthorized?.call();
-          }
-          handler.next(error);
-        },
-      ),
-    );
+    _attachInterceptor();
+  }
+
+  @visibleForTesting
+  static void injectDioForTest(Dio dio) {
+    _dio = dio;
+    _attachInterceptor();
   }
 
   static Future<Map<String, dynamic>> login(
@@ -222,7 +204,7 @@ class ApiService {
       );
       return Contact.fromJson(res.data['data']);
     } on DioException catch (e) {
-      throw Exception(parseError(e));
+      throw ErrorHandler.handle(e);
     }
   }
 
@@ -249,6 +231,11 @@ class ApiService {
     return e.toString();
   }
 
+  @visibleForTesting
+  static void resetDioForTest() {
+    _dio = _defaultDio();
+  }
+
   static Future<ContactInfo> saveContactInfo({
     required String email,
     required String phone,
@@ -261,7 +248,7 @@ class ApiService {
       );
       return ContactInfo.fromJson(res.data['data']);
     } on DioException catch (e) {
-      throw Exception(parseError(e));
+      throw ErrorHandler.handle(e);
     }
   }
 
@@ -286,7 +273,7 @@ class ApiService {
       final res = await _dio.put('${ApiConfig.gallery}/$id', data: form);
       return Gallery.fromJson(res.data['data']);
     } on DioException catch (e) {
-      throw Exception(parseError(e));
+      throw ErrorHandler.handle(e);
     }
   }
 
@@ -313,9 +300,43 @@ class ApiService {
       final res = await _dio.put('${ApiConfig.news}/$id', data: form);
       return News.fromJson(res.data['data']);
     } on DioException catch (e) {
-      throw Exception(parseError(e));
+      throw ErrorHandler.handle(e);
     }
   }
+
+  static void _attachInterceptor() {
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          final prefs = await SharedPreferences.getInstance();
+          final token = prefs.getString(ApiConfig.tokenKey);
+          if (token != null && token.isNotEmpty) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+          handler.next(options);
+        },
+        onError: (error, handler) {
+          final status = error.response?.statusCode;
+          final path = error.requestOptions.path;
+          final isLoginAttempt = path.endsWith(ApiConfig.login);
+
+          if (status == 401 && !isLoginAttempt) {
+            onUnauthorized?.call();
+          }
+          handler.next(error);
+        },
+      ),
+    );
+  }
+
+  static Dio _defaultDio() => Dio(
+    BaseOptions(
+      baseUrl: ApiConfig.baseUrl,
+      connectTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 30),
+      headers: {'Accept': 'application/json'},
+    ),
+  );
 }
 
 class ContactPage {

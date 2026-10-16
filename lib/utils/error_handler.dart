@@ -8,19 +8,23 @@ class ErrorHandler {
       final statusCode = error.response?.statusCode;
       final data = error.response?.data;
 
-      String message = 'An unexpected error occurred';
-
+      String? serverMessage;
       if (data is Map<String, dynamic> && data.containsKey('message')) {
-        message = data['message'].toString();
+        serverMessage = data['message'].toString();
       } else if (data is String) {
-        message = data;
+        serverMessage = data;
       }
+
+      final fallback = serverMessage ?? 'An unexpected error occurred';
 
       switch (statusCode) {
         case 400:
-          return AppException(message, 400);
+          return AppException(fallback, 400);
         case 401:
-          return AppException('Session expired. Please log in again.', 401);
+          return AppException(
+            serverMessage ?? 'Session expired. Please log in again.',
+            401,
+          );
         case 403:
           return AppException(
             'You do not have permission to perform this action.',
@@ -34,7 +38,7 @@ class ErrorHandler {
             500,
           );
         default:
-          return AppException(message, statusCode);
+          return AppException(fallback, statusCode);
       }
     }
 
