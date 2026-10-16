@@ -22,13 +22,28 @@ void main() {
       expect(result.statusCode, 400);
     });
 
-    test('handles 401 Unauthorized', () {
+    test('handles 401 with server message', () {
       final error = DioException(
         requestOptions: RequestOptions(path: '/'),
         response: Response(
           requestOptions: RequestOptions(path: '/'),
           statusCode: 401,
-          data: {'message': 'Token expired'},
+          data: {'message': 'These credentials do not match our records.'},
+        ),
+      );
+
+      final result = ErrorHandler.handle(error);
+
+      expect(result.message, 'These credentials do not match our records.');
+      expect(result.statusCode, 401);
+    });
+
+    test('handles 401 without server message', () {
+      final error = DioException(
+        requestOptions: RequestOptions(path: '/'),
+        response: Response(
+          requestOptions: RequestOptions(path: '/'),
+          statusCode: 401,
         ),
       );
 
