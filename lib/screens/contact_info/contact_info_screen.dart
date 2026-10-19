@@ -186,7 +186,11 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<ContactInfoProvider>();
 
-    return AdminScaffold(title: 'Info Kontak', child: _buildBody(provider));
+    return AdminScaffold(
+      title: 'Info',
+      navIndex: 4,
+      child: _buildBody(provider),
+    );
   }
 
   @override

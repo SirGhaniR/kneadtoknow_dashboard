@@ -179,7 +179,11 @@ class _GalleryListScreenState extends State<GalleryListScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<GalleryProvider>();
 
-    return AdminScaffold(title: 'Galeri', child: _buildBody(provider));
+    return AdminScaffold(
+      title: 'Galeri',
+      navIndex: 2,
+      child: _buildBody(provider),
+    );
   }
 
   @override

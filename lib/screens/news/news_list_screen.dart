@@ -23,7 +23,11 @@ class _NewsListScreenState extends State<NewsListScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<NewsProvider>();
 
-    return AdminScaffold(title: 'Berita', child: _buildBody(provider));
+    return AdminScaffold(
+      title: 'Berita',
+      navIndex: 1,
+      child: _buildBody(provider),
+    );
   }
 
   @override

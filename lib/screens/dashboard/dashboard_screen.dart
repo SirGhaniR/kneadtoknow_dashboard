@@ -26,7 +26,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: _handleBack,
-      child: AdminScaffold(title: 'Dashboard', child: _buildBody(provider)),
+      child: AdminScaffold(
+        title: 'Dashboard',
+        navIndex: 0,
+        child: _buildBody(provider),
+      ),
     );
   }
 
@@ -128,12 +132,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _handleBack(bool didPop, dynamic result) {
     if (didPop) return;
-
-    final scaffold = Scaffold.maybeOf(context);
-    if (scaffold != null && scaffold.isDrawerOpen) {
-      scaffold.closeDrawer();
-      return;
-    }
 
     final now = DateTime.now();
     final isSecondPress =

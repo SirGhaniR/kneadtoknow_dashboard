@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../config/app_theme.dart';
-import 'app_sidebar.dart';
+import 'app_bottom_nav.dart';
 
 class AdminScaffold extends StatelessWidget {
   final String title;
@@ -9,25 +8,24 @@ class AdminScaffold extends StatelessWidget {
   final List<Widget>? actions;
   final Widget? floatingActionButton;
 
+  final int navIndex;
+
   const AdminScaffold({
     super.key,
     required this.title,
     required this.child,
     this.actions,
     this.floatingActionButton,
+    this.navIndex = 0,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(
-        backgroundColor: AppColors.gray900,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-        child: const AppSidebar(),
-      ),
       floatingActionButton: floatingActionButton,
+      bottomNavigationBar: AppBottomNav(currentIndex: navIndex),
       body: SafeArea(
-        bottom: true,
+        bottom: false,
         child: Column(
           children: [
             _Header(title: title, actions: actions),
@@ -59,13 +57,6 @@ class _Header extends StatelessWidget {
           ),
           const Spacer(),
           ...?actions,
-          Builder(
-            builder: (ctx) => IconButton(
-              onPressed: () => Scaffold.of(ctx).openDrawer(),
-              icon: const Icon(Icons.menu),
-              color: AppColors.gray900,
-            ),
-          ),
         ],
       ),
     );

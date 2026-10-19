@@ -21,7 +21,11 @@ class _ContactListScreenState extends State<ContactListScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<ContactProvider>();
 
-    return AdminScaffold(title: 'Kontak', child: _buildBody(provider));
+    return AdminScaffold(
+      title: 'Contact',
+      navIndex: 3,
+      child: _buildBody(provider),
+    );
   }
 
   @override
