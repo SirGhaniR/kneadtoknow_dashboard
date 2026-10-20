@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../config/app_theme.dart';
 import '../../models/news.dart';
 import '../../providers/news_provider.dart';
+import '../../utils/animations.dart';
 import '../../utils/image_url.dart';
 import '../../utils/time_ago.dart';
 import '../../widgets/admin_scaffold.dart';
@@ -44,12 +45,17 @@ class _NewsListScreenState extends State<NewsListScreen> {
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text(
-            'Berita - Management',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          const FadeSlideIn(
+            child: Text(
+              'Berita - Management',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
           ),
           const SizedBox(height: 16),
-          const NewsForm(),
+          const FadeSlideIn(
+            delay: Duration(milliseconds: 100),
+            child: NewsForm(),
+          ),
           const SizedBox(height: 24),
           _buildList(provider),
           const SizedBox(height: 16),
@@ -94,16 +100,18 @@ class _NewsListScreenState extends State<NewsListScreen> {
 
     return Column(
       spacing: 12,
-      children: provider.items
-          .map(
-            (n) => _NewsTile(
-              news: n,
-              onTap: () => _showDetail(n),
-              onEdit: () => _openEdit(n),
-              onDelete: () => _confirmDelete(n),
-            ),
-          )
-          .toList(),
+      children: List.generate(provider.items.length, (i) {
+        final n = provider.items[i];
+        return StaggeredList(
+          index: i,
+          child: _NewsTile(
+            news: n,
+            onTap: () => _showDetail(n),
+            onEdit: () => _openEdit(n),
+            onDelete: () => _confirmDelete(n),
+          ),
+        );
+      }),
     );
   }
 
@@ -196,118 +204,117 @@ class _NewsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      child: InkWell(
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.gray300),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (news.image != null && news.image!.isNotEmpty)
-                Image.network(
-                  imageUrl(news.image),
+    return PressScale(
+      onTap: onTap,
+      scale: 0.99,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: AppColors.gray300),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            if (news.image != null && news.image!.isNotEmpty)
+              Image.network(
+                imageUrl(news.image),
+                width: 130,
+                height: 130,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => Container(
                   width: 130,
                   height: 130,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => Container(
-                    width: 130,
-                    height: 130,
-                    color: AppColors.gray100,
-                    child: const Icon(
-                      Icons.broken_image,
-                      color: AppColors.gray500,
-                    ),
+                  color: AppColors.gray100,
+                  child: const Icon(
+                    Icons.broken_image,
+                    color: AppColors.gray500,
                   ),
                 ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 6,
-                    children: [
-                      Row(
-                        spacing: 8,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              news.title,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 14,
+              ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 6,
+                  children: [
+                    Row(
+                      spacing: 8,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            news.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        if (news.isFeatured)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            color: AppColors.yellow100,
+                            child: const Text(
+                              'Featured',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: AppColors.yellow800,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
-                          if (news.isFeatured)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              color: AppColors.yellow100,
-                              child: const Text(
-                                'Featured',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: AppColors.yellow800,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                        ],
+                      ],
+                    ),
+                    Text(
+                      news.content,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.gray600,
                       ),
-                      Text(
-                        news.content,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.gray600,
+                    ),
+                    Row(
+                      spacing: 12,
+                      children: [
+                        Text(
+                          timeAgo(news.createdAt),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColors.gray500,
+                          ),
                         ),
-                      ),
-                      Row(
-                        spacing: 12,
-                        children: [
-                          Text(
-                            timeAgo(news.createdAt),
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: AppColors.gray500,
-                            ),
-                          ),
-                          const Spacer(),
-                          IconButton(
-                            onPressed: onEdit,
-                            icon: const Icon(Icons.edit_outlined),
-                            iconSize: 18,
-                            color: AppColors.yellow600,
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            tooltip: 'Edit',
-                          ),
-                          IconButton(
-                            onPressed: onDelete,
-                            icon: const Icon(Icons.delete_outline),
-                            iconSize: 18,
-                            color: AppColors.red400,
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            tooltip: 'Hapus',
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        const Spacer(),
+                        IconButton(
+                          onPressed: onEdit,
+                          icon: const Icon(Icons.edit_outlined),
+                          iconSize: 18,
+                          color: AppColors.yellow600,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          tooltip: 'Edit',
+                        ),
+                        IconButton(
+                          onPressed: onDelete,
+                          icon: const Icon(Icons.delete_outline),
+                          iconSize: 18,
+                          color: AppColors.red400,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          tooltip: 'Hapus',
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

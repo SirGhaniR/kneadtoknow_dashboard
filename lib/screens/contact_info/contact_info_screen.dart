@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../config/app_theme.dart';
 import '../../providers/contact_info_provider.dart';
+import '../../utils/animations.dart';
 import '../../widgets/admin_scaffold.dart';
 
 class ContactInfoForm extends StatefulWidget {
@@ -48,16 +49,25 @@ class _ContactInfoFormState extends State<ContactInfoForm> {
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
 
-          if (_error != null)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              color: AppColors.red100,
-              child: Text(
-                _error!,
-                style: const TextStyle(color: AppColors.red800, fontSize: 13),
-              ),
-            ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOut,
+            child: _error != null
+                ? Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 4),
+                    padding: const EdgeInsets.all(12),
+                    color: AppColors.red100,
+                    child: Text(
+                      _error!,
+                      style: const TextStyle(
+                        color: AppColors.red800,
+                        fontSize: 13,
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
 
           _field(
             label: 'Email',
@@ -92,16 +102,20 @@ class _ContactInfoFormState extends State<ContactInfoForm> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: isSaving ? null : _submit,
-              child: isSaving
-                  ? const SizedBox(
-                      height: 18,
-                      width: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Text('Update Info Kontak'),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                child: isSaving
+                    ? const SizedBox(
+                        key: ValueKey('loading'),
+                        height: 18,
+                        width: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text('Update Info Kontak', key: ValueKey('text')),
+              ),
             ),
           ),
         ],
@@ -227,12 +241,17 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text(
-            'Info Kontak - Management',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          const FadeSlideIn(
+            child: Text(
+              'Info Kontak - Management',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
           ),
           const SizedBox(height: 16),
-          ContactInfoForm(info: provider.info),
+          FadeSlideIn(
+            delay: const Duration(milliseconds: 100),
+            child: ContactInfoForm(info: provider.info),
+          ),
         ],
       ),
     );

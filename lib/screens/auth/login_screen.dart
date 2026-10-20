@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../config/app_theme.dart';
 import '../../providers/auth_provider.dart';
+import '../../utils/animations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -25,85 +26,118 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-            child: Container(
-              width: 420,
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 56),
-              decoration: BoxDecoration(
-                color: AppColors.gray50,
-                border: Border.all(color: AppColors.gray300),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x1A000000),
-                    blurRadius: 8,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                spacing: 12,
-                children: [
-                  const Text(
-                    'LOGIN',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1,
+            child: FadeSlideIn(
+              offset: const Offset(0, 0.05),
+              duration: const Duration(milliseconds: 500),
+              child: Container(
+                width: 420,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40,
+                  vertical: 56,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.gray50,
+                  border: Border.all(color: AppColors.gray300),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x1A000000),
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
                     ),
-                  ),
-                  const Text(
-                    'Welcome! Login di sini untuk membuktikan kamu admin.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13, color: AppColors.gray600),
-                  ),
-                  const SizedBox(height: 20),
-
-                  if (auth.error != null) ...[
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      color: const Color(0xFFFEE2E2),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 12,
+                  children: [
+                    const FadeSlideIn(
+                      delay: Duration(milliseconds: 100),
                       child: Text(
-                        auth.error!,
-                        style: const TextStyle(
-                          color: AppColors.red800,
-                          fontSize: 13,
+                        'LOGIN',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 4),
-                  ],
+                    const FadeSlideIn(
+                      delay: Duration(milliseconds: 180),
+                      child: Text(
+                        'Welcome! Login di sini untuk membuktikan kamu admin.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.gray600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
 
-                  TextField(
-                    controller: _emailCtrl,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(hintText: 'Email'),
-                  ),
-                  TextField(
-                    controller: _passCtrl,
-                    obscureText: true,
-                    decoration: const InputDecoration(hintText: 'Password'),
-                    onSubmitted: (_) => _submit(),
-                  ),
-                  const SizedBox(height: 12),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: auth.isLoading ? null : _submit,
-                      child: auth.isLoading
-                          ? const SizedBox(
-                              height: 18,
-                              width: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
+                    AnimatedSize(
+                      duration: const Duration(milliseconds: 250),
+                      curve: Curves.easeOut,
+                      child: auth.error != null
+                          ? Container(
+                              width: double.infinity,
+                              margin: const EdgeInsets.only(bottom: 4),
+                              padding: const EdgeInsets.all(12),
+                              color: const Color(0xFFFEE2E2),
+                              child: Text(
+                                auth.error!,
+                                style: const TextStyle(
+                                  color: AppColors.red800,
+                                  fontSize: 13,
+                                ),
                               ),
                             )
-                          : const Text('KIRIM'),
+                          : const SizedBox.shrink(),
                     ),
-                  ),
-                ],
+
+                    FadeSlideIn(
+                      delay: const Duration(milliseconds: 260),
+                      child: TextField(
+                        controller: _emailCtrl,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: const InputDecoration(hintText: 'Email'),
+                      ),
+                    ),
+                    FadeSlideIn(
+                      delay: const Duration(milliseconds: 320),
+                      child: TextField(
+                        controller: _passCtrl,
+                        obscureText: true,
+                        decoration: const InputDecoration(hintText: 'Password'),
+                        onSubmitted: (_) => _submit(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    FadeSlideIn(
+                      delay: const Duration(milliseconds: 380),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: auth.isLoading ? null : _submit,
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 200),
+                            child: auth.isLoading
+                                ? const SizedBox(
+                                    key: ValueKey('loading'),
+                                    height: 18,
+                                    width: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Text('KIRIM', key: ValueKey('text')),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

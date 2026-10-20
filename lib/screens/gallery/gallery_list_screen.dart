@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../config/app_theme.dart';
 import '../../models/gallery.dart';
 import '../../providers/gallery_provider.dart';
+import '../../utils/animations.dart';
 import '../../utils/image_url.dart';
 import '../../widgets/admin_scaffold.dart';
 import '../../widgets/gallery_detail_dialog.dart';
@@ -32,107 +33,106 @@ class _GalleryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      child: InkWell(
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.gray300),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: gallery.image != null && gallery.image!.isNotEmpty
-                          ? Image.network(
-                              imageUrl(gallery.image),
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, _, _) => Container(
-                                color: AppColors.gray100,
-                                child: const Icon(
-                                  Icons.broken_image,
+    return PressScale(
+      onTap: onTap,
+      scale: 0.98,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: AppColors.gray300),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: gallery.image != null && gallery.image!.isNotEmpty
+                        ? Image.network(
+                            imageUrl(gallery.image),
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => Container(
+                              color: AppColors.gray100,
+                              child: const Icon(
+                                Icons.broken_image,
+                                color: AppColors.gray500,
+                              ),
+                            ),
+                          )
+                        : Container(
+                            color: AppColors.gray100,
+                            child: const Center(
+                              child: Text(
+                                'No Image',
+                                style: TextStyle(
+                                  fontSize: 12,
                                   color: AppColors.gray500,
                                 ),
                               ),
-                            )
-                          : Container(
-                              color: AppColors.gray100,
-                              child: const Center(
-                                child: Text(
-                                  'No Image',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.gray500,
-                                  ),
-                                ),
-                              ),
                             ),
-                    ),
-                    Positioned(
-                      top: 6,
-                      right: 6,
-                      child: Row(
-                        spacing: 4,
-                        children: [
-                          _overlayIcon(
-                            icon: Icons.edit_outlined,
-                            color: AppColors.yellow600,
-                            onTap: onEdit,
                           ),
-                          _overlayIcon(
-                            icon: Icons.delete_outline,
-                            color: AppColors.red400,
-                            onTap: onDelete,
-                          ),
-                        ],
-                      ),
+                  ),
+                  Positioned(
+                    top: 6,
+                    right: 6,
+                    child: Row(
+                      spacing: 4,
+                      children: [
+                        _overlayIcon(
+                          icon: Icons.edit_outlined,
+                          color: AppColors.yellow600,
+                          onTap: onEdit,
+                        ),
+                        _overlayIcon(
+                          icon: Icons.delete_outline,
+                          color: AppColors.red400,
+                          onTap: onDelete,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 4,
-                  children: [
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 4,
+                children: [
+                  Text(
+                    gallery.title.isEmpty ? 'Untitled' : gallery.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (gallery.description != null &&
+                      gallery.description!.isNotEmpty)
                     Text(
-                      gallery.title.isEmpty ? 'Untitled' : gallery.title,
+                      gallery.description!,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    if (gallery.description != null &&
-                        gallery.description!.isNotEmpty)
-                      Text(
-                        gallery.description!,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.gray600,
-                        ),
-                      ),
-                    const Divider(height: 8),
-                    Text(
-                      _formatDate(gallery.createdAt),
-                      style: const TextStyle(
                         fontSize: 11,
-                        color: AppColors.gray500,
+                        color: AppColors.gray600,
                       ),
                     ),
-                  ],
-                ),
+                  const Divider(height: 8),
+                  Text(
+                    _formatDate(gallery.createdAt),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppColors.gray500,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -200,12 +200,17 @@ class _GalleryListScreenState extends State<GalleryListScreen> {
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text(
-            'Galeri - Management',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          const FadeSlideIn(
+            child: Text(
+              'Galeri - Management',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
           ),
           const SizedBox(height: 16),
-          const GalleryForm(),
+          const FadeSlideIn(
+            delay: Duration(milliseconds: 100),
+            child: GalleryForm(),
+          ),
           const SizedBox(height: 24),
           _buildGrid(provider),
           const SizedBox(height: 16),
@@ -260,11 +265,14 @@ class _GalleryListScreenState extends State<GalleryListScreen> {
       itemCount: provider.items.length,
       itemBuilder: (context, index) {
         final g = provider.items[index];
-        return _GalleryCard(
-          gallery: g,
-          onTap: () => _showDetail(g),
-          onEdit: () => _openEdit(g),
-          onDelete: () => _confirmDelete(g),
+        return StaggeredList(
+          index: index,
+          child: _GalleryCard(
+            gallery: g,
+            onTap: () => _showDetail(g),
+            onEdit: () => _openEdit(g),
+            onDelete: () => _confirmDelete(g),
+          ),
         );
       },
     );

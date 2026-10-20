@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../config/app_theme.dart';
 import '../../models/contact.dart';
 import '../../providers/contact_provider.dart';
+import '../../utils/animations.dart';
 import '../../utils/time_ago.dart';
 import '../../widgets/admin_scaffold.dart';
 import '../../widgets/contact_detail_dialog.dart';
@@ -42,12 +43,17 @@ class _ContactListScreenState extends State<ContactListScreen> {
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text(
-            'Kontak - Management',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          const FadeSlideIn(
+            child: Text(
+              'Kontak - Management',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
           ),
           const SizedBox(height: 16),
-          const _InfoBanner(),
+          const FadeSlideIn(
+            delay: Duration(milliseconds: 100),
+            child: _InfoBanner(),
+          ),
           const SizedBox(height: 16),
           _buildList(provider),
           const SizedBox(height: 16),
@@ -92,16 +98,18 @@ class _ContactListScreenState extends State<ContactListScreen> {
 
     return Column(
       spacing: 12,
-      children: provider.items
-          .map(
-            (c) => _ContactTile(
-              contact: c,
-              onTap: () => _showDetail(c),
-              onMarkRead: c.isRead ? null : () => _markRead(c),
-              onDelete: () => _confirmDelete(c),
-            ),
-          )
-          .toList(),
+      children: List.generate(provider.items.length, (i) {
+        final c = provider.items[i];
+        return StaggeredList(
+          index: i,
+          child: _ContactTile(
+            contact: c,
+            onTap: () => _showDetail(c),
+            onMarkRead: c.isRead ? null : () => _markRead(c),
+            onDelete: () => _confirmDelete(c),
+          ),
+        );
+      }),
     );
   }
 
@@ -200,123 +208,122 @@ class _ContactTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      child: InkWell(
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: contact.isRead ? AppColors.gray300 : AppColors.yellow600,
-            ),
+    return PressScale(
+      onTap: onTap,
+      scale: 0.99,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(
+            color: contact.isRead ? AppColors.gray300 : AppColors.yellow600,
           ),
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 6,
-            children: [
-              Row(
-                spacing: 8,
-                children: [
-                  Expanded(
-                    child: Text(
-                      contact.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 14,
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 6,
+          children: [
+            Row(
+              spacing: 8,
+              children: [
+                Expanded(
+                  child: Text(
+                    contact.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                AnimatedOpacity(
+                  opacity: contact.isRead ? 0 : 1,
+                  duration: const Duration(milliseconds: 250),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    color: AppColors.yellow100,
+                    child: const Text(
+                      'Baru',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppColors.yellow800,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-                  if (!contact.isRead)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      color: AppColors.yellow100,
-                      child: const Text(
-                        'Baru',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: AppColors.yellow800,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              Text(
-                contact.email,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 12, color: AppColors.gray600),
-              ),
-              Text(
-                contact.subject.isEmpty ? '(tanpa subjek)' : contact.subject,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
                 ),
-              ),
-              Text(
-                contact.message,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 12, color: AppColors.gray600),
-              ),
-              Row(
-                spacing: 12,
-                children: [
-                  Text(
-                    timeAgo(contact.createdAt),
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: AppColors.gray500,
-                    ),
+              ],
+            ),
+            Text(
+              contact.email,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 12, color: AppColors.gray600),
+            ),
+            Text(
+              contact.subject.isEmpty ? '(tanpa subjek)' : contact.subject,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+            ),
+            Text(
+              contact.message,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 12, color: AppColors.gray600),
+            ),
+            Row(
+              spacing: 12,
+              children: [
+                Text(
+                  timeAgo(contact.createdAt),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.gray500,
                   ),
-                  const Spacer(),
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => ContactReplyScreen(contact: contact),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.reply_outlined),
+                  iconSize: 18,
+                  color: const Color(0xFF3B82F6),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  tooltip: 'Reply',
+                ),
+                if (onMarkRead != null)
                   IconButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => ContactReplyScreen(contact: contact),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.reply_outlined),
+                    onPressed: onMarkRead,
+                    icon: const Icon(Icons.mark_email_read_outlined),
                     iconSize: 18,
-                    color: const Color(0xFF3B82F6),
+                    color: const Color(0xFF10B981),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
-                    tooltip: 'Reply',
+                    tooltip: 'Mark as Read',
                   ),
-                  if (onMarkRead != null)
-                    IconButton(
-                      onPressed: onMarkRead,
-                      icon: const Icon(Icons.mark_email_read_outlined),
-                      iconSize: 18,
-                      color: const Color(0xFF10B981),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      tooltip: 'Mark as Read',
-                    ),
-                  IconButton(
-                    onPressed: onDelete,
-                    icon: const Icon(Icons.delete_outline),
-                    iconSize: 18,
-                    color: AppColors.red400,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    tooltip: 'Hapus',
-                  ),
-                ],
-              ),
-            ],
-          ),
+                IconButton(
+                  onPressed: onDelete,
+                  icon: const Icon(Icons.delete_outline),
+                  iconSize: 18,
+                  color: AppColors.red400,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  tooltip: 'Hapus',
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
