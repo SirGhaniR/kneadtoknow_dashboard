@@ -4,13 +4,15 @@ import '../config/app_theme.dart';
 import '../models/contact.dart';
 import '../models/news.dart';
 import '../screens/news/news_form_screen.dart';
+import '../utils/animations.dart';
 import '../utils/image_url.dart';
 import '../utils/time_ago.dart';
+import 'app_shell.dart';
 
 Widget _sectionHeader(
   BuildContext context, {
   required String title,
-  required String route,
+  required int tabIndex,
 }) {
   return Row(
     children: [
@@ -20,7 +22,7 @@ Widget _sectionHeader(
       ),
       const Spacer(),
       GestureDetector(
-        onTap: () => Navigator.pushNamed(context, route),
+        onTap: () => AppTabs.of(context).goToTab(tabIndex),
         child: const Text(
           'Lihat semua',
           style: TextStyle(fontSize: 12, color: AppColors.gray600),
@@ -43,68 +45,70 @@ class FeaturedNewsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 12,
       children: [
-        _sectionHeader(context, title: 'Berita Unggulan', route: '/news'),
+        _sectionHeader(context, title: 'Berita Unggulan', tabIndex: 1),
         ...items.map((n) => _featuredCard(context, n)),
       ],
     );
   }
 
   Widget _featuredCard(BuildContext context, News news) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppColors.gray300),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (news.image != null && news.image!.isNotEmpty)
-            Image.network(
-              imageUrl(news.image),
-              width: double.infinity,
-              height: 160,
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Container(
-                height: 160,
-                color: AppColors.gray100,
-                child: const Icon(Icons.broken_image, color: AppColors.gray500),
+    return PressScale(
+      onTap: () => Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => NewsFormScreen(news: news))),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: AppColors.gray300),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (news.image != null && news.image!.isNotEmpty)
+              ClipRect(
+                child: Image.network(
+                  imageUrl(news.image),
+                  width: double.infinity,
+                  height: 160,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => Container(
+                    height: 160,
+                    color: AppColors.gray100,
+                    child: const Icon(
+                      Icons.broken_image,
+                      color: AppColors.gray500,
+                    ),
+                  ),
+                ),
               ),
-            ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 6,
-              children: [
-                Text(
-                  news.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 6,
+                children: [
+                  Text(
+                    news.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                Text(
-                  news.content,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.gray600,
+                  Text(
+                    news.content,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.gray600,
+                    ),
                   ),
-                ),
-                Row(
-                  spacing: 8,
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => NewsFormScreen(news: news),
-                        ),
-                      ),
-                      child: const Text(
+                  Row(
+                    spacing: 8,
+                    children: [
+                      const Text(
                         'Edit',
                         style: TextStyle(
                           fontSize: 12,
@@ -112,24 +116,27 @@ class FeaturedNewsSection extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ),
-                    const Text(
-                      '|',
-                      style: TextStyle(color: AppColors.gray300, fontSize: 12),
-                    ),
-                    Text(
-                      _formatDate(news.createdAt),
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppColors.gray500,
+                      const Text(
+                        '|',
+                        style: TextStyle(
+                          color: AppColors.gray300,
+                          fontSize: 12,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                      Text(
+                        _formatDate(news.createdAt),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.gray500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -172,19 +179,19 @@ class QuickActions extends StatelessWidget {
           context,
           title: 'Kelola Berita',
           subtitle: 'Tambah, edit, atau hapus berita',
-          route: '/news',
+          tabIndex: 1,
         ),
         _actionCard(
           context,
           title: 'Kelola Galeri',
           subtitle: 'Upload dan kelola foto galeri',
-          route: '/gallery',
+          tabIndex: 2,
         ),
         _actionCard(
           context,
           title: 'Kelola Kontak',
           subtitle: '$unreadContacts pesan belum dibaca',
-          route: '/contacts',
+          tabIndex: 3,
         ),
       ],
     );
@@ -194,36 +201,39 @@ class QuickActions extends StatelessWidget {
     BuildContext context, {
     required String title,
     required String subtitle,
-    required String route,
+    required int tabIndex,
   }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppColors.gray300),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 6,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-          ),
-          Text(
-            subtitle,
-            style: const TextStyle(fontSize: 12, color: AppColors.gray600),
-          ),
-          const SizedBox(height: 6),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-              onPressed: () => Navigator.pushNamed(context, route),
-              child: const Text('Buka Manajemen'),
+    return PressScale(
+      onTap: () => AppTabs.of(context).goToTab(tabIndex),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: AppColors.gray300),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 6,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
             ),
-          ),
-        ],
+            Text(
+              subtitle,
+              style: const TextStyle(fontSize: 12, color: AppColors.gray600),
+            ),
+            const SizedBox(height: 6),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () => AppTabs.of(context).goToTab(tabIndex),
+                child: const Text('Buka Manajemen'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -240,7 +250,7 @@ class RecentContactsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 12,
       children: [
-        _sectionHeader(context, title: 'Pesan Terbaru', route: '/contacts'),
+        _sectionHeader(context, title: 'Pesan Terbaru', tabIndex: 3),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -341,7 +351,7 @@ class RecentNewsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 12,
       children: [
-        _sectionHeader(context, title: 'Berita Terbaru', route: '/news'),
+        _sectionHeader(context, title: 'Berita Terbaru', tabIndex: 1),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,

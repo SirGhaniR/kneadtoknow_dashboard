@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/dashboard_provider.dart';
+import '../../utils/animations.dart';
 import '../../widgets/admin_scaffold.dart';
 import '../../widgets/chart_activity_line.dart';
 import '../../widgets/chart_comparison_donut.dart';
@@ -17,20 +17,14 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  DateTime? _lastBackPress;
-
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<DashboardProvider>();
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: _handleBack,
-      child: AdminScaffold(
-        title: 'Dashboard',
-        navIndex: 0,
-        child: _buildBody(provider),
-      ),
+    return AdminScaffold(
+      title: 'Dashboard',
+      navIndex: 0,
+      child: _buildBody(provider),
     );
   }
 
@@ -73,84 +67,84 @@ class _DashboardScreenState extends State<DashboardScreen> {
         itemBuilder: (context, index) {
           switch (index) {
             case 0:
-              return const Text(
-                'Statistik',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              return const StaggeredList(
+                index: 0,
+                child: Text(
+                  'Statistik',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               );
             case 1:
-              return GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 1.4,
-                children: [
-                  StatCard(
-                    route: '/news',
-                    label: 'Total Berita',
-                    value: stats.totalNews,
-                  ),
-                  StatCard(
-                    route: '/gallery',
-                    label: 'Total Galeri',
-                    value: stats.totalGallery,
-                  ),
-                  StatCard(
-                    route: '/contacts',
-                    label: 'Total Kontak',
-                    value: stats.totalContacts,
-                  ),
-                  StatCard(
-                    route: '/contacts',
-                    label: 'Belum Dibaca',
-                    value: stats.unreadContacts,
-                  ),
-                ],
+              return StaggeredList(
+                index: 1,
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 1.4,
+                  children: [
+                    StatCard(
+                      tabIndex: 1,
+                      label: 'Total Berita',
+                      value: stats.totalNews,
+                    ),
+                    StatCard(
+                      tabIndex: 2,
+                      label: 'Total Galeri',
+                      value: stats.totalGallery,
+                    ),
+                    StatCard(
+                      tabIndex: 3,
+                      label: 'Total Kontak',
+                      value: stats.totalContacts,
+                    ),
+                    StatCard(
+                      tabIndex: 3,
+                      label: 'Belum Dibaca',
+                      value: stats.unreadContacts,
+                    ),
+                  ],
+                ),
               );
             case 2:
-              return ChartActivityLine(data: stats.activity);
+              return StaggeredList(
+                index: 2,
+                child: ChartActivityLine(data: stats.activity),
+              );
             case 3:
-              return ChartComparisonDonut(
-                newsCount: stats.totalNews,
-                galleryCount: stats.totalGallery,
-                contactCount: stats.totalContacts,
+              return StaggeredList(
+                index: 3,
+                child: ChartComparisonDonut(
+                  newsCount: stats.totalNews,
+                  galleryCount: stats.totalGallery,
+                  contactCount: stats.totalContacts,
+                ),
               );
             case 4:
-              return QuickActions(unreadContacts: stats.unreadContacts);
+              return StaggeredList(
+                index: 4,
+                child: QuickActions(unreadContacts: stats.unreadContacts),
+              );
             case 5:
-              return RecentNewsSection(items: stats.recentNews);
+              return StaggeredList(
+                index: 5,
+                child: RecentNewsSection(items: stats.recentNews),
+              );
             case 6:
-              return RecentContactsSection(items: stats.recentContacts);
+              return StaggeredList(
+                index: 6,
+                child: RecentContactsSection(items: stats.recentContacts),
+              );
             default:
-              return FeaturedNewsSection(items: stats.featuredNews);
+              return StaggeredList(
+                index: 7,
+                child: FeaturedNewsSection(items: stats.featuredNews),
+              );
           }
         },
       ),
     );
-  }
-
-  void _handleBack(bool didPop, dynamic result) {
-    if (didPop) return;
-
-    final now = DateTime.now();
-    final isSecondPress =
-        _lastBackPress != null &&
-        now.difference(_lastBackPress!) < const Duration(seconds: 2);
-
-    if (isSecondPress) {
-      SystemNavigator.pop();
-      return;
-    }
-
-    _lastBackPress = now;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(
-          content: Text('Tekan sekali lagi untuk keluar'),
-          duration: Duration(seconds: 2),
-        ),
-      );
   }
 }
