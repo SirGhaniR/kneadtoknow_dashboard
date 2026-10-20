@@ -42,25 +42,34 @@ class _ImagePickerBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         height: 160,
         width: double.infinity,
         decoration: BoxDecoration(
           color: AppColors.gray100,
           border: Border.all(color: AppColors.gray200),
         ),
-        child: _buildContent(),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 250),
+          child: _buildContent(),
+        ),
       ),
     );
   }
 
   Widget _buildContent() {
     if (pickedFile != null) {
-      return Image.file(pickedFile!, fit: BoxFit.cover);
+      return Image.file(
+        pickedFile!,
+        key: const ValueKey('file'),
+        fit: BoxFit.cover,
+      );
     }
     if (existingUrl != null && existingUrl!.isNotEmpty) {
       return Image.network(
         existingUrl!,
+        key: const ValueKey('network'),
         fit: BoxFit.cover,
         errorBuilder: (_, _, _) => _emptyState(),
       );
@@ -70,6 +79,7 @@ class _ImagePickerBox extends StatelessWidget {
 
   Widget _emptyState() {
     return const Center(
+      key: ValueKey('empty'),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         spacing: 8,
@@ -118,16 +128,25 @@ class _NewsFormState extends State<NewsForm> {
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
 
-          if (_error != null)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              color: AppColors.red100,
-              child: Text(
-                _error!,
-                style: const TextStyle(color: AppColors.red800, fontSize: 13),
-              ),
-            ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOut,
+            child: _error != null
+                ? Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 4),
+                    padding: const EdgeInsets.all(12),
+                    color: AppColors.red100,
+                    child: Text(
+                      _error!,
+                      style: const TextStyle(
+                        color: AppColors.red800,
+                        fontSize: 13,
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
 
           LayoutBuilder(
             builder: (context, constraints) {
@@ -212,16 +231,23 @@ class _NewsFormState extends State<NewsForm> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: isSaving ? null : _submit,
-                  child: isSaving
-                      ? const SizedBox(
-                          height: 18,
-                          width: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    child: isSaving
+                        ? const SizedBox(
+                            key: ValueKey('loading'),
+                            height: 18,
+                            width: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(
+                            isEdit ? 'Update News' : 'Create News',
+                            key: const ValueKey('text'),
                           ),
-                        )
-                      : Text(isEdit ? 'Update News' : 'Create News'),
+                  ),
                 ),
               ),
               SizedBox(
