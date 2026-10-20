@@ -8,16 +8,21 @@ import '../providers/auth_provider.dart';
 
 class AppBottomNav extends StatelessWidget {
   static const _items = <_NavItem>[
-    _NavItem(icon: Icons.tune, label: 'Dashboard', route: null),
-    _NavItem(icon: Icons.newspaper, label: 'Berita', route: '/news'),
-    _NavItem(icon: Icons.photo_library, label: 'Galeri', route: '/gallery'),
-    _NavItem(icon: Icons.mail_outline, label: 'Kontak', route: '/contacts'),
-    _NavItem(icon: Icons.badge_outlined, label: 'Info', route: '/contact-info'),
+    _NavItem(icon: Icons.tune, label: 'Dashboard'),
+    _NavItem(icon: Icons.newspaper, label: 'Berita'),
+    _NavItem(icon: Icons.photo_library, label: 'Galeri'),
+    _NavItem(icon: Icons.mail_outline, label: 'Kontak'),
+    _NavItem(icon: Icons.badge_outlined, label: 'Info'),
   ];
 
   final int currentIndex;
+  final ValueChanged<int> onTabSelected;
 
-  const AppBottomNav({super.key, this.currentIndex = 0});
+  const AppBottomNav({
+    super.key,
+    this.currentIndex = 0,
+    required this.onTabSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +34,7 @@ class AppBottomNav extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 64,
+          height: 68,
           child: Row(
             children: [
               for (var i = 0; i < _items.length; i++)
@@ -37,7 +42,7 @@ class AppBottomNav extends StatelessWidget {
                   child: _NavButton(
                     item: _items[i],
                     selected: i == currentIndex,
-                    onTap: () => _goTo(context, i),
+                    onTap: () => onTabSelected(i),
                   ),
                 ),
               Expanded(
@@ -45,7 +50,6 @@ class AppBottomNav extends StatelessWidget {
                   item: const _NavItem(
                     icon: Icons.more_horiz,
                     label: 'Lainnya',
-                    route: null,
                   ),
                   selected: false,
                   onTap: () => _openMoreSheet(context),
@@ -58,23 +62,8 @@ class AppBottomNav extends StatelessWidget {
     );
   }
 
-  void _goTo(BuildContext context, int index) {
-    if (index == currentIndex) return;
-
-    final route = _items[index].route;
-    final navigator = Navigator.of(context);
-
-    if (route == null) {
-      navigator.popUntil((r) => r.isFirst);
-    } else {
-      navigator.popUntil((r) => r.isFirst);
-      navigator.pushNamed(route);
-    }
-  }
-
   Future<void> _logout(BuildContext context) async {
     final auth = context.read<AuthProvider>();
-    final navigator = Navigator.of(context);
 
     final confirm = await showDialog<bool>(
       context: context,
@@ -99,8 +88,6 @@ class AppBottomNav extends StatelessWidget {
     );
 
     if (confirm != true) return;
-
-    navigator.popUntil((r) => r.isFirst);
     await auth.logout();
   }
 
@@ -151,7 +138,7 @@ class AppBottomNav extends StatelessWidget {
   }
 }
 
-class _NavButton extends StatelessWidget {
+class _NavButton extends StatefulWidget {
   final _NavItem item;
   final bool selected;
   final VoidCallback onTap;
@@ -163,44 +150,113 @@ class _NavButton extends StatelessWidget {
   });
 
   @override
+  State<_NavButton> createState() => _NavButtonState();
+}
+
+class _NavButtonState extends State<_NavButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scale;
+
+  @override
   Widget build(BuildContext context) {
-    final color = selected ? AppColors.gray900 : AppColors.gray500;
+    final color = widget.selected ? AppColors.gray900 : AppColors.gray500;
 
     return InkWell(
-      onTap: onTap,
+      onTap: widget.onTap,
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 4,
         children: [
-          Icon(item.icon, size: 22, color: color),
-          Text(
-            item.label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-              color: color,
+          ScaleTransition(
+            scale: _scale,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOut,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: widget.selected ? AppColors.gray100 : Colors.transparent,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                transitionBuilder: (child, animation) =>
+                    ScaleTransition(scale: animation, child: child),
+                child: Icon(
+                  widget.item.icon,
+                  key: ValueKey(widget.selected),
+                  size: 22,
+                  color: color,
+                ),
+              ),
             ),
           ),
-          Container(
-            width: 4,
-            height: 4,
+          AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 200),
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: widget.selected ? FontWeight.w700 : FontWeight.w500,
+              color: color,
+            ),
+            child: Text(
+              widget.item.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOut,
+            width: widget.selected ? 16 : 4,
+            height: 3,
             decoration: BoxDecoration(
-              color: selected ? AppColors.gray900 : Colors.transparent,
-              shape: BoxShape.circle,
+              color: widget.selected ? AppColors.gray900 : Colors.transparent,
+              borderRadius: BorderRadius.circular(2),
             ),
           ),
         ],
       ),
     );
   }
+
+  @override
+  void didUpdateWidget(covariant _NavButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.selected != oldWidget.selected) {
+      if (widget.selected) {
+        _controller.forward();
+      } else {
+        _controller.reverse();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+      value: widget.selected ? 1 : 0,
+    );
+    _scale = Tween<double>(
+      begin: 1.0,
+      end: 1.08,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+  }
 }
 
 class _NavItem {
   final IconData icon;
   final String label;
-  final String? route;
 
-  const _NavItem({required this.icon, required this.label, this.route});
+  const _NavItem({required this.icon, required this.label});
 }

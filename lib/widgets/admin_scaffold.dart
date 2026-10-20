@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'app_bottom_nav.dart';
-
 class AdminScaffold extends StatelessWidget {
   final String title;
   final Widget child;
@@ -23,7 +21,6 @@ class AdminScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: floatingActionButton,
-      bottomNavigationBar: AppBottomNav(currentIndex: navIndex),
       body: SafeArea(
         bottom: false,
         child: Column(

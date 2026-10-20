@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'config/app_theme.dart';
@@ -15,6 +16,7 @@ import 'screens/dashboard/dashboard_screen.dart';
 import 'screens/gallery/gallery_list_screen.dart';
 import 'screens/news/news_list_screen.dart';
 import 'services/api_service.dart';
+import 'widgets/app_shell.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,23 +56,80 @@ class KneadToKnowApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light,
         home: const _RootRouter(),
-        routes: {
-          '/news': (_) => const NewsListScreen(),
-          '/gallery': (_) => const GalleryListScreen(),
-          '/contacts': (_) => const ContactListScreen(),
-          '/contact-info': (_) => const ContactInfoScreen(),
-        },
       ),
     );
   }
 }
 
-class _RootRouter extends StatelessWidget {
+class _RootRouter extends StatefulWidget {
   const _RootRouter();
+
+  @override
+  State<_RootRouter> createState() => _RootRouterState();
+}
+
+class _RootRouterState extends State<_RootRouter> {
+  static const _screens = <Widget>[
+    DashboardScreen(),
+    NewsListScreen(),
+    GalleryListScreen(),
+    ContactListScreen(),
+    ContactInfoScreen(),
+  ];
+  int _index = 0;
+
+  DateTime? _lastBackPress;
 
   @override
   Widget build(BuildContext context) {
     final isLoggedIn = context.select<AuthProvider, bool>((a) => a.isLoggedIn);
-    return isLoggedIn ? const DashboardScreen() : const LoginScreen();
+
+    if (!isLoggedIn) {
+      return const LoginScreen();
+    }
+
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: _handleBack,
+      child: AppShell(
+        navIndex: _index,
+        onTabSelected: (i) => setState(() => _index = i),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 250),
+          switchInCurve: Curves.easeOut,
+          switchOutCurve: Curves.easeIn,
+          child: KeyedSubtree(key: ValueKey(_index), child: _screens[_index]),
+        ),
+      ),
+    );
+  }
+
+  void _handleBack(bool didPop, dynamic result) {
+    if (didPop) return;
+
+    if (_index != 0) {
+      setState(() => _index = 0);
+      return;
+    }
+
+    final now = DateTime.now();
+    final isSecondPress =
+        _lastBackPress != null &&
+        now.difference(_lastBackPress!) < const Duration(seconds: 2);
+
+    if (isSecondPress) {
+      SystemNavigator.pop();
+      return;
+    }
+
+    _lastBackPress = now;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(
+          content: Text('Tekan sekali lagi untuk keluar'),
+          duration: Duration(seconds: 2),
+        ),
+      );
   }
 }
